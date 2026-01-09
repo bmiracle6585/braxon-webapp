@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tech Portal - Braxon Project Management</title>
-    <link rel="stylesheet" href="CSS/Styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     
     <!-- Leaflet CSS (for consistency, even though not using map) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -64,7 +64,7 @@
                 <div class="user-role">Admin</div>
             </div>
         </div>
-        <button class="btn-signout" onclick="window.location.href='Index.html'">
+        <button class="btn-signout" onclick="window.location.href='index.html'">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                 <polyline points="16 17 21 12 16 7"></polyline>
@@ -316,8 +316,8 @@
 </div>
 
     <!-- Scripts -->
-    <script src="JS/tech-portal.js"></script>
-    <script src="JS/tech-portal-access.js"></script>
+    <script src="js/tech-portal.js"></script>
+    <script src="js/tech-portal-access.js"></script>
     <script>
   // Show admin link only for admin users
   if (localStorage.getItem('userRole') === 'admin') {

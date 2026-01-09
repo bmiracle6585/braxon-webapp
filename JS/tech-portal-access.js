@@ -135,7 +135,7 @@ class TechPortalAccess {
                 <p>You don't have permission to view this page. The Tech Portal is available for field personnel and administrators only.</p>
                 
                 <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
-                    <a href="Dashboard.html" class="contact-admin">
+                    <a href="dashboard.html" class="contact-admin">
                         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                         </svg>
