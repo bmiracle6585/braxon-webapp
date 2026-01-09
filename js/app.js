@@ -114,16 +114,17 @@ try {
             
             showNotification('Login successful! Redirecting...', 'success');
             
-            // ✅ Role-based redirect
+// ✅ Role-based redirect
 const userRole = data.user.role;
 
 if (userRole === 'field') {
-    // Field technicians go to mobile dashboard
-    window.location.href = '/mobile-dashboard.html';
+  // Field technicians
+  window.location.href = '/mobile-dashboard-v2.html';
 } else {
-    // PMs, Admins, QA, Customers go to desktop dashboard
-    window.location.href = '/dashboard';
+  // Admin, PM, QA, Customer
+  window.location.href = '/dashboard.html';
 }
+
 
         } else {
             // Show error message
