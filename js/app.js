@@ -79,25 +79,26 @@ async function handleLogin(e) {
     const password = document.getElementById('password').value;
     const submitBtn = e.target.querySelector('button[type="submit"]');
 
-    // Basic validation
-    if (!email || !password) {
-        showNotification('Please enter both email and password', 'error');
-        return;
-    }
+// Basic validation
+if (!email || !password) {
+    showNotification('Please enter both email and password', 'error');
+    return;
+}
 
-    // Disable submit button
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Signing in...';
+// Disable submit button
+submitBtn.disabled = true;
+submitBtn.textContent = 'Signing in...';
 
-    try {
-        // Call backend API
-        const response = await ('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
+try {
+    // Call backend API
+    const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    });
+
 
         const data = await response.json();
         console.log('LOGIN RESPONSE:', data);  // ADD THIS LINE
@@ -268,7 +269,7 @@ document.head.appendChild(style);
 async function fetchProjects() {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/projects', {
+    const response = await fetch('/api/auth/login', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
