@@ -46,7 +46,7 @@ async function fetchWithAuth(url, options = {}) {
 
         return response;
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error(' error:', error);
         throw error;
     }
 }
@@ -91,7 +91,7 @@ async function handleLogin(e) {
 
     try {
         // Call backend API
-        const response = await fetch('http://localhost:5000/api/auth/login', {
+        const response = await ('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -268,7 +268,7 @@ document.head.appendChild(style);
 async function fetchProjects() {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/projects', {
+    const response = await fetch('/api/projects', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -290,7 +290,7 @@ async function fetchProjects() {
 async function fetchProjectById(projectId) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+    const response = await fetch(`/api/projects/${projectId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -312,7 +312,7 @@ async function fetchProjectById(projectId) {
 async function createProject(projectData) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/projects', {
+    const response = await fetch('/api/projects', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ async function createProject(projectData) {
 async function updateProject(projectId, projectData) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+    const response = await fetch(`/api/projects/${projectId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -362,7 +362,7 @@ async function updateProject(projectId, projectData) {
 async function deleteProject(projectId) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+    const response = await fetch(`/api/projects/${projectId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -386,7 +386,7 @@ async function deleteProject(projectId) {
 async function fetchCustomers() {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/customers', {
+    const response = await fetch('/api/customers', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
