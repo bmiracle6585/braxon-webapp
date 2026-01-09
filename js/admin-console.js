@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadUsers() {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/users', {
+    const response = await fetch('/api/users', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -143,8 +143,8 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
   try {
     const token = localStorage.getItem('token');
     const url = userId 
-      ? `http://localhost:5000/api/users/${userId}`
-      : 'http://localhost:5000/api/users';
+      ? `/api/users/${userId}`
+      : '/api/users';
     
     const method = userId ? 'PUT' : 'POST';
 
@@ -181,7 +181,7 @@ async function toggleUserStatus(userId, activate) {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+    const response = await fetch(`/api/users/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ async function confirmDeleteUser(userId, userName) {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+    const response = await fetch(`/api/users/${userId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
