@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "The5M!racle$",
+    "database": "braxon_db",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "The5M!racle$",
+    "database": "braxon_db_test",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "The5M!racle$",
+    "database": "braxon_db",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}

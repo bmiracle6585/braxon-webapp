@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Braxon Industries</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        --accent-primary: #dc143c;
+        --accent-secondary: #b8102e;
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --text-dark: #1a1a1a;
+        --text-light: #6c757d;
+        --bg-light: #ffffff;
+        --bg-card: #ffffff;
+        --border-color: #dee2e6;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f9fa;
+        color: var(--text-dark);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Header */
+    .profile-header {
+        background: var(--bg-card);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid var(--border-color);
+    }
+
+    .header-left {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+    }
+
+    .user-avatar-large {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+        border: 4px solid rgba(220, 20, 60, 0.15);
+        box-shadow: 0 4px 12px rgba(220, 20, 60, 0.2);
+    }
+
+    .user-info-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .user-name-large {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .user-role-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        font-size: 13px;
+        font-weight: 600;
+        width: fit-content;
+        color: white;
+    }
+
+    .user-contact {
+        font-size: 14px;
+        color: var(--text-light);
+        margin-top: 5px;
+    }
+
+    .user-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-light);
+        margin-top: 8px;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        background: #6c757d;
+        color: white;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-back:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    /* Basic Info Card */
+    .basic-info-card {
+        background: var(--bg-card);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border-color);
+    }
+
+    .card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .info-value {
+        font-size: 16px;
+        color: var(--text-dark);
+        font-weight: 500;
+    }
+
+    /* Category Cards Grid */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .category-card {
+        background: var(--bg-card);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid var(--border-color);
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(220, 20, 60, 0.15);
+        border-color: var(--accent-primary);
+    }
+
+    .category-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .category-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+    }
+
+    .category-summary {
+        font-size: 14px;
+        color: var(--text-light);
+        margin-bottom: 15px;
+        min-height: 40px;
+    }
+
+    .category-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .badge-complete {
+        background: rgba(40, 167, 69, 0.15);
+        color: var(--success);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .badge-warning {
+        background: rgba(255, 193, 7, 0.15);
+        color: #d39e00;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .badge-na {
+        background: rgba(108, 117, 125, 0.15);
+        color: var(--text-light);
+        border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-view-details {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view-details:hover {
+        box-shadow: 0 6px 20px rgba(220, 20, 60, 0.3);
+        transform: translateY(-2px);
+    }
+
+    /* Loading State */
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 60px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(220, 20, 60, 0.2);
+        border-top-color: var(--accent-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .header-left {
+            flex-direction: column;
+        }
+
+        .user-avatar-large {
+            width: 80px;
+            height: 80px;
+            font-size: 32px;
+        }
+
+        .user-name-large {
+            font-size: 24px;
+        }
+
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-spinner">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Profile Content (hidden initially) -->
+        <div id="profileContent" style="display: none;">
+            <!-- Header -->
+            <div class="profile-header">
+                <div class="header-left">
+                    <div class="user-avatar-large" id="userAvatar">BM</div>
+                    <div class="user-info-header">
+                        <div class="user-name-large" id="userName">Loading...</div>
+                        <div class="user-role-badge" id="userRole">User</div>
+                        <div class="user-contact">
+                            <span id="userEmail">email@example.com</span> • 
+                            <span id="userPhone">555-0000</span>
+                        </div>
+                        <div class="user-status">
+                            <span class="status-dot"></span>
+                            <span>Active since <span id="hireDate">N/A</span></span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-back" onclick="goBack()">← Back</button>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="basic-info-card">
+                <div class="card-title">
+                    <span>📋</span>
+                    <span>BASIC INFORMATION</span>
+                </div>
+                <div class="info-grid" id="basicInfoGrid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Category Cards -->
+            <div class="categories-grid">
+                <!-- Emergency Contacts -->
+                <div class="category-card" onclick="viewCategory('emergency-contacts')">
+                    <div class="category-icon">🚨</div>
+                    <div class="category-title">Emergency Contacts</div>
+                    <div class="category-summary" id="summary-emergency">
+                        Loading...
+                    </div>
+                    <div id="badge-emergency"></div>
+                    <button class="btn-view-details">View Details →</button>
+                </div>
+
+                <!-- Safety Certifications -->
+                <div class="category-card" onclick="viewCategory('certifications')">
+                    <div class="category-icon">📜</div>
+                    <div class="category-title">Safety Certifications</div>
+                    <div class="category-summary" id="summary-certifications">
+                        Loading...
+                    </div>
+                    <div id="badge-certifications"></div>
+                    <button class="btn-view-details">View Details →</button>
+                </div>
+
+                <!-- Assigned Equipment -->
+                <div class="category-card" onclick="viewCategory('equipment')">
+                    <div class="category-icon">🧰</div>
+                    <div class="category-title">Assigned Equipment</div>
+                    <div class="category-summary" id="summary-equipment">
+                        Loading...
+                    </div>
+                    <div id="badge-equipment"></div>
+                    <button class="btn-view-details">View Details →</button>
+                </div>
+
+                <!-- Vehicle Assignment -->
+                <div class="category-card" onclick="viewCategory('vehicle')">
+                    <div class="category-icon">🚗</div>
+                    <div class="category-title">Vehicle Assignment</div>
+                    <div class="category-summary" id="summary-vehicle">
+                        No vehicle currently assigned
+                    </div>
+                    <div id="badge-vehicle">
+                        <span class="category-badge badge-na">N/A</span>
+                    </div>
+                    <button class="btn-view-details">View Details →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let currentUserId = null;
+        let profileData = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get user ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            currentUserId = urlParams.get('userId');
+
+            if (!currentUserId) {
+                alert('No user ID specified');
+                window.location.href = 'admin-console.html';
+                return;
+            }
+
+            // Load profile data
+            await loadProfileData();
+        });
+
+        // Load full profile data
+        async function loadProfileData() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Please login first');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:5000/api/user-profile/${currentUserId}/full-profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Failed to load profile');
+                }
+
+                profileData = result.data;
+                renderProfile();
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                alert('Failed to load profile: ' + error.message);
+                document.getElementById('loadingState').innerHTML = `
+                    <div style="text-align: center; color: #dc3545;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                        <h2>Failed to Load Profile</h2>
+                        <p>${error.message}</p>
+                        <button class="btn-back" onclick="goBack()" style="margin-top: 20px;">
+                            ← Go Back
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Render profile data
+        function renderProfile() {
+            const { user, emergencyContacts, certifications, equipment, sectionStatuses } = profileData;
+
+            // Update header
+            document.getElementById('userName').textContent = user.full_name || 'Unknown User';
+            document.getElementById('userRole').textContent = formatRole(user.role);
+            document.getElementById('userEmail').textContent = user.email || 'N/A';
+            document.getElementById('userPhone').textContent = user.phone || 'N/A';
+            document.getElementById('hireDate').textContent = user.created_at ? 
+                new Date(user.created_at).toLocaleDateString() : 'N/A';
+
+            // Set avatar initials
+            const initials = getInitials(user.full_name);
+            document.getElementById('userAvatar').textContent = initials;
+
+            // Render basic info
+            renderBasicInfo(user);
+
+            // Render category summaries
+            renderEmergencySummary(emergencyContacts, sectionStatuses.emergency_contacts);
+            renderCertificationsSummary(certifications, sectionStatuses.certifications);
+            renderEquipmentSummary(equipment, sectionStatuses.equipment);
+
+            // Show profile content
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+        }
+
+        // Render basic information
+        function renderBasicInfo(user) {
+            const grid = document.getElementById('basicInfoGrid');
+            grid.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">${user.username || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">${user.email || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">${user.phone || 'N/A'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Role</div>
+                    <div class="info-value">${formatRole(user.role)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Company</div>
+                    <div class="info-value">${user.company || 'Braxon Industries'}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Hire Date</div>
+                    <div class="info-value">${user.created_at ? 
+                        new Date(user.created_at).toLocaleDateString() : 'N/A'}</div>
+                </div>
+            `;
+        }
+
+        // Render emergency contacts summary
+        function renderEmergencySummary(contacts, status) {
+            const summary = document.getElementById('summary-emergency');
+            const badge = document.getElementById('badge-emergency');
+
+            if (status && status.status === 'na') {
+                summary.textContent = status.na_reason || 'Marked as N/A';
+                badge.innerHTML = '<span class="category-badge badge-na">N/A</span>';
+                return;
+            }
+
+            if (!contacts || contacts.length === 0) {
+                summary.textContent = 'No emergency contacts on file';
+                badge.innerHTML = '<span class="category-badge badge-warning">⚠️ Incomplete</span>';
+            } else {
+                const primary = contacts.find(c => c.contact_type === 'primary');
+                const secondary = contacts.find(c => c.contact_type === 'secondary');
+                summary.textContent = `${contacts.length} contact${contacts.length > 1 ? 's' : ''} on file`;
+                badge.innerHTML = '<span class="category-badge badge-complete">✓ Complete</span>';
+            }
+        }
+
+        // Render certifications summary
+        function renderCertificationsSummary(certifications, status) {
+            const summary = document.getElementById('summary-certifications');
+            const badge = document.getElementById('badge-certifications');
+
+            if (status && status.status === 'na') {
+                summary.textContent = status.na_reason || 'Marked as N/A';
+                badge.innerHTML = '<span class="category-badge badge-na">N/A</span>';
+                return;
+            }
+
+            if (!certifications || certifications.length === 0) {
+                summary.textContent = 'No certifications on file';
+                badge.innerHTML = '<span class="category-badge badge-warning">⚠️ Incomplete</span>';
+            } else {
+                const expired = certifications.filter(c => {
+                    if (!c.expiration_date) return false;
+                    return new Date(c.expiration_date) < new Date();
+                }).length;
+
+                const expiring = certifications.filter(c => {
+                    if (!c.expiration_date) return false;
+                    const daysUntil = Math.floor((new Date(c.expiration_date) - new Date()) / (1000 * 60 * 60 * 24));
+                    return daysUntil > 0 && daysUntil <= 30;
+                }).length;
+
+                summary.textContent = `${certifications.length} certification${certifications.length > 1 ? 's' : ''} on file`;
+
+                if (expired > 0) {
+                    badge.innerHTML = `<span class="category-badge badge-warning">❌ ${expired} Expired</span>`;
+                } else if (expiring > 0) {
+                    badge.innerHTML = `<span class="category-badge badge-warning">⚠️ ${expiring} Expiring Soon</span>`;
+                } else {
+                    badge.innerHTML = '<span class="category-badge badge-complete">✓ All Current</span>';
+                }
+            }
+        }
+
+        // Render equipment summary
+        function renderEquipmentSummary(equipment, status) {
+            const summary = document.getElementById('summary-equipment');
+            const badge = document.getElementById('badge-equipment');
+
+            if (status && status.status === 'na') {
+                summary.textContent = status.na_reason || 'Marked as N/A';
+                badge.innerHTML = '<span class="category-badge badge-na">N/A</span>';
+                return;
+            }
+
+            if (!equipment || equipment.length === 0) {
+                summary.textContent = 'No equipment assigned';
+                badge.innerHTML = '<span class="category-badge badge-na">None Assigned</span>';
+            } else {
+                summary.textContent = `${equipment.length} item${equipment.length > 1 ? 's' : ''} assigned`;
+                badge.innerHTML = '<span class="category-badge badge-complete">✓ Assigned</span>';
+            }
+        }
+
+        // Navigate to category detail page
+        function viewCategory(category) {
+            window.location.href = `profile-${category}.html?userId=${currentUserId}`;
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Utility functions
+        function getInitials(fullName) {
+            if (!fullName) return '??';
+            const parts = fullName.split(' ');
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return fullName.substring(0, 2).toUpperCase();
+        }
+
+        function formatRole(role) {
+            const roleMap = {
+                'admin': 'Administrator',
+                'pm': 'Project Manager',
+                'foreman': 'Foreman',
+                'field': 'Field Technician',
+                'qa': 'QA Inspector',
+                'customer': 'Customer'
+            };
+            return roleMap[role] || role;
+        }
+    </script>
+</body>
+</html>

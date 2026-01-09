@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/auth.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Braxon Industries</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Leaflet.js - Interactive Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet.markercluster - Group nearby markers -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <img src="assets/logo.svg" alt="Braxon Industries Logo" class="braxon-logo-sidebar">
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="projects.html" class="nav-item">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span>Projects</span>
+                </a>
+
+                <a href="tech-portal.html" class="nav-item" id="techPortalNavLink">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    <span>Tech Portal</span>
+                    <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; margin-left: auto;">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg>
+                </a>
+                <a href="/admin-console" class="nav-item" id="adminLink" style="display: none;">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Admin Console</span>
+                </a>
+            </nav>
+
+            <!-- User Profile & Sign Out -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-name" id="dashboardUserName">Blake Miracle</div>
+                    <div class="user-email" id="dashboardUserEmail">Blake@braxon.net</div>
+                    <div class="user-role" id="dashboardUserRole">Admin</div>
+                </div>
+                <button class="btn-signout" onclick="logout()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Header -->
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">Welcome back, <span id="headerUserName">Blake Miracle</span></h1>
+                    <p class="page-subtitle">Here's an overview of your projects and recent activity</p>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Active Projects</span>
+                        <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="activeProjectsCount">0</div>
+                    <div class="stat-description">Currently in progress</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">In Progress</span>
+                        <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="inProgressCount">0</div>
+                    <div class="stat-description">Active construction</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Completed</span>
+                        <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="9 12 12 15 16 10"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-description">Successfully delivered</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Pending</span>
+                        <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-description">Awaiting action</div>
+                </div>
+            </div>
+
+            <!-- Project Schedule Widget -->
+            <div class="dashboard-card schedule-widget">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-week"></i>
+                        Project Schedule
+                    </h3>
+                    <span class="week-indicator" id="currentWeekDates"></span>
+                </div>
+                <div class="card-body">
+                    <div class="schedule-columns">
+                        <!-- This Week Column -->
+                        <div class="schedule-column">
+                            <div class="schedule-column-header">
+                                <h4>This Week</h4>
+                                <span class="week-range" id="thisWeekRange"></span>
+                            </div>
+                            <div class="schedule-column-body" id="thisWeekProjects">
+                                <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 12px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p style="margin: 0; font-size: 14px;">Loading projects...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Next Week Column -->
+                        <div class="schedule-column">
+                            <div class="schedule-column-header">
+                                <h4>Next Week</h4>
+                                <span class="week-range" id="nextWeekRange"></span>
+                            </div>
+                            <div class="schedule-column-body" id="nextWeekProjects">
+                                <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                                    <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 12px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p style="margin: 0; font-size: 14px;">Loading projects...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Projects Section -->
+            <div class="section-card">
+                <h2 class="section-title">Recent Projects</h2>
+                
+                <div class="project-list" id="recentProjectsList">
+                    <div style="text-align: center; padding: 40px; color: #94a3b8;">
+                        <p>Loading projects...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Location Map Widget -->
+            <div class="dashboard-card map-widget-card">
+                <div class="card-header-with-legend">
+                    <div>
+                        <h2 class="card-title">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            Active Project Locations
+                        </h2>
+                        <p class="card-subtitle">2-week project schedule map</p>
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot current-week"></span>
+                            <span>This Week</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot next-week"></span>
+                            <span>Next Week</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="projectMap" class="project-map"></div>
+                
+                <!-- Map Stats -->
+                <div class="map-stats">
+                    <div class="map-stat-item">
+                        <span class="stat-number" id="currentWeekCount">0</span>
+                        <span class="stat-label">Sites This Week</span>
+                    </div>
+                    <div class="map-stat-item">
+                        <span class="stat-number" id="nextWeekCount">0</span>
+                        <span class="stat-label">Sites Next Week</span>
+                    </div>
+                    <div class="map-stat-item">
+                        <span class="stat-number" id="totalSitesCount">0</span>
+                        <span class="stat-label">Total Active Sites</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Info Cards -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <polyline points="17 11 19 13 23 9"></polyline>
+                        </svg>
+                        <span class="info-label">Your Role</span>
+                    </div>
+                    <div class="info-value" id="userRoleDisplay">Loading...</div>
+                    <div class="info-description">Access level</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                            <polyline points="13 2 13 9 20 9"></polyline>
+                        </svg>
+                        <span class="info-label">Total Documents</span>
+                    </div>
+                    <div class="info-value">—</div>
+                    <div class="info-description">Across all projects</div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span class="info-label">Photos Uploaded</span>
+                    </div>
+                    <div class="info-value">—</div>
+                    <div class="info-description">Documentation photos</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="JS/dashboard-map.js"></script>
+    <script src="JS/tech-portal-access.js"></script>
+    
+    <script>
+        // ============================================
+        // DASHBOARD INITIALIZATION & DATA LOADING
+        // ============================================
+        
+        let projectsData = [];
+        let dailyReportsData = {};
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initializeUserInfo();
+            await loadDashboardData();
+        });
+
+        // ============================================
+        // INITIALIZE USER INFO
+        // ============================================
+        function initializeUserInfo() {
+            const userName = localStorage.getItem('userName') || 'User';
+            const userEmail = localStorage.getItem('userEmail') || '';
+            const userRole = localStorage.getItem('userRole') || 'user';
+            
+            // Update header
+            const headerName = document.getElementById('headerUserName');
+            if (headerName) headerName.textContent = userName;
+            
+            // Update sidebar
+            const sidebarName = document.getElementById('dashboardUserName');
+            const sidebarEmail = document.getElementById('dashboardUserEmail');
+            const sidebarRole = document.getElementById('dashboardUserRole');
+            
+            if (sidebarName) sidebarName.textContent = userName;
+            if (sidebarEmail) sidebarEmail.textContent = userEmail;
+            if (sidebarRole) sidebarRole.textContent = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+            
+            // Update role display
+            const roleDisplay = document.getElementById('userRoleDisplay');
+            if (roleDisplay) {
+                roleDisplay.textContent = userRole === 'admin' ? 'Braxon Admin' : 
+                                          userRole === 'pm' ? 'Project Manager' : 'Technician';
+            }
+            
+            // Show admin link if admin
+            if (userRole === 'admin') {
+                const adminLink = document.getElementById('adminLink');
+                if (adminLink) adminLink.style.display = 'flex';
+            }
+        }
+
+        // ============================================
+        // LOAD ALL DASHBOARD DATA
+        // ============================================
+        async function loadDashboardData() {
+            try {
+                console.log('🔄 Loading dashboard data...');
+                
+                // Load projects
+                const projectsResponse = await fetchWithAuth('/api/projects');
+                const projectsResult = await projectsResponse.json();
+                
+                if (projectsResult.success && projectsResult.data) {
+                    projectsData = projectsResult.data;
+                    console.log(`✅ Loaded ${projectsData.length} projects`);
+                    
+                    // Update stats
+                    updateProjectStats(projectsData);
+                    
+                    // Load schedule
+                    await loadProjectSchedule();
+                    
+                    // Load recent projects
+                    loadRecentProjects(projectsData);
+                } else {
+                    console.error('❌ Failed to load projects:', projectsResult.message);
+                }
+                
+            } catch (error) {
+                console.error('❌ Dashboard error:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        // ============================================
+        // UPDATE PROJECT STATS CARDS
+        // ============================================
+        function updateProjectStats(projects) {
+            const active = projects.filter(p => p.status === 'in_progress').length;
+            const completed = projects.filter(p => p.status === 'completed').length;
+            const pending = projects.filter(p => p.status === 'pending').length;
+            
+            document.getElementById('activeProjectsCount').textContent = active;
+            document.getElementById('inProgressCount').textContent = active;
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        // ============================================
+        // LOAD PROJECT SCHEDULE WIDGET
+        // ============================================
+        async function loadProjectSchedule() {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            // Calculate week ranges
+            const thisWeekStart = new Date(now);
+            const thisWeekEnd = new Date(now);
+            thisWeekEnd.setDate(thisWeekEnd.getDate() + 6);
+            thisWeekEnd.setHours(23, 59, 59, 999);
+            
+            const nextWeekStart = new Date(now);
+            nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+            
+            const nextWeekEnd = new Date(now);
+            nextWeekEnd.setDate(nextWeekEnd.getDate() + 13);
+            nextWeekEnd.setHours(23, 59, 59, 999);
+            
+            // Update week range displays
+            document.getElementById('thisWeekRange').textContent = formatDateRange(thisWeekStart, thisWeekEnd);
+            document.getElementById('nextWeekRange').textContent = formatDateRange(nextWeekStart, nextWeekEnd);
+            document.getElementById('currentWeekDates').textContent = formatDateRange(thisWeekStart, nextWeekEnd);
+            
+            // Filter projects by date
+            const thisWeekProjects = [];
+            const nextWeekProjects = [];
+            
+            // Get in_progress projects
+            const activeProjects = projectsData.filter(p => p.status === 'in_progress');
+            
+            // Load daily reports for each project
+            for (const project of activeProjects) {
+                // Get latest daily report
+                try {
+                    const reportResponse = await fetchWithAuth(`/api/daily-reports/project/${project.id}/latest`);
+                    const reportResult = await reportResponse.json();
+                    
+                    if (reportResult.success && reportResult.data) {
+                        dailyReportsData[project.id] = reportResult.data;
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load daily report for project ${project.id}`);
+                }
+                
+                // Determine week based on start_date
+                const startDate = new Date(project.start_date);
+                
+                if (startDate >= thisWeekStart && startDate <= thisWeekEnd) {
+                    thisWeekProjects.push(project);
+                } else if (startDate >= nextWeekStart && startDate <= nextWeekEnd) {
+                    nextWeekProjects.push(project);
+                }
+            }
+            
+            console.log(`📊 Schedule split: ${thisWeekProjects.length} this week, ${nextWeekProjects.length} next week`);
+            
+            // Render both columns
+            renderProjectColumn('thisWeekProjects', thisWeekProjects, 'this');
+            renderProjectColumn('nextWeekProjects', nextWeekProjects, 'next');
+        }
+
+        // ============================================
+        // RENDER PROJECT COLUMN
+        // ============================================
+        function renderProjectColumn(containerId, projects, week) {
+            const container = document.getElementById(containerId);
+            
+            if (!projects || projects.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 12px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p style="margin: 0; font-size: 14px;">No projects scheduled</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            for (const project of projects) {
+                const dailyReport = dailyReportsData[project.id];
+                html += renderProjectCard(project, dailyReport, week);
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // ============================================
+        // RENDER INDIVIDUAL PROJECT CARD
+        // ============================================
+        function renderProjectCard(project, dailyReport, week) {
+            const projectName = project.project_name || project.name || 'Unnamed Project';
+            const scheduleDate = new Date(project.start_date);
+            const siteA = project.site_a_name || 'Site A';
+            const siteB = project.site_b_name || 'Site B';
+            const endDate = project.end_date ? new Date(project.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
+            const borderColor = week === 'this' ? '#10b981' : '#3b82f6';
+            
+            // Format daily report section
+            let dailyReportHTML = '';
+            if (dailyReport) {
+                const reportDate = new Date(dailyReport.report_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const workPreview = dailyReport.work_description 
+                    ? (dailyReport.work_description.substring(0, 80) + (dailyReport.work_description.length > 80 ? '...' : ''))
+                    : dailyReport.general_notes 
+                    ? (dailyReport.general_notes.substring(0, 80) + (dailyReport.general_notes.length > 80 ? '...' : ''))
+                    : 'No description provided';
+                
+                const hasConcerns = dailyReport.issues_concerns && dailyReport.issues_concerns.trim() !== '';
+                
+                dailyReportHTML = `
+                    <div style="background: #f8fafc; border-radius: 8px; padding: 12px; margin-top: 12px; border-left: 3px solid ${borderColor};">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                            <div style="font-size: 12px; font-weight: 600; color: ${borderColor};">
+                                📋 Latest Update (${reportDate})
+                            </div>
+                            ${hasConcerns ? `
+                                <span style="background: #fef3c7; color: #d97706; font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                                    ⚠️ Concern
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div style="font-size: 13px; color: #475569; line-height: 1.4;">
+                            ${workPreview}
+                        </div>
+                        <button onclick="window.location.href='project-details.html?id=${project.id}'" style="background: none; border: none; color: ${borderColor}; font-size: 12px; font-weight: 600; margin-top: 6px; cursor: pointer; padding: 0;">
+                            View Full Report →
+                        </button>
+                    </div>
+                `;
+            } else {
+                dailyReportHTML = `
+                    <div style="background: #fef2f2; border-radius: 8px; padding: 10px; margin-top: 12px; text-align: center; border: 1px dashed #fca5a5;">
+                        <div style="font-size: 12px; color: #991b1b;">
+                            No field updates available yet
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="schedule-project-card" style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b;">
+                            ${siteA} → ${siteB}
+                        </h4>
+                        <button class="toggle-details-btn" onclick="toggleProjectDetails(this)" 
+                                style="background: ${borderColor}; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                            <span class="arrow">▼</span>
+                        </button>
+                    </div>
+                    
+                    <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">
+                        ${scheduleDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                    
+                    <div class="project-details" style="display: none;">
+                        <hr style="margin: 12px 0; border: none; border-top: 1px solid #e2e8f0;">
+                        
+                        <div style="display: grid; gap: 8px; font-size: 13px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #64748b;">Project Status:</span>
+                                <span style="font-weight: 600; color: ${borderColor};">In Progress</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #64748b;">Site A:</span>
+                                <span style="font-weight: 600; color: #1e293b;">${siteA}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #64748b;">Site B:</span>
+                                <span style="font-weight: 600; color: #1e293b;">${siteB}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #64748b;">End Date:</span>
+                                <span style="font-weight: 600; color: #1e293b;">${endDate}</span>
+                            </div>
+                        </div>
+                        
+                        ${dailyReportHTML}
+                        
+                        <button onclick="window.location.href='project-details.html?id=${project.id}'" 
+                                style="width: 100%; margin-top: 12px; background: ${borderColor}; color: white; border: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                            View Full Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // TOGGLE PROJECT DETAILS DROPDOWN
+        // ============================================
+        function toggleProjectDetails(button) {
+            const card = button.closest('.schedule-project-card');
+            const details = card.querySelector('.project-details');
+            const arrow = button.querySelector('.arrow');
+            
+            if (details.style.display === 'none') {
+                details.style.display = 'block';
+                arrow.textContent = '▲';
+            } else {
+                details.style.display = 'none';
+                arrow.textContent = '▼';
+            }
+        }
+
+        // ============================================
+        // LOAD RECENT PROJECTS
+        // ============================================
+        function loadRecentProjects(projects) {
+            const container = document.getElementById('recentProjectsList');
+            
+            // Get 5 most recent projects
+            const recentProjects = projects
+                .filter(p => p.status === 'in_progress')
+                .sort((a, b) => new Date(b.start_date) - new Date(a.start_date))
+                .slice(0, 5);
+            
+            if (recentProjects.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #94a3b8;">
+                        <p>No recent projects</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = recentProjects.map(project => `
+                <div class="project-item" onclick="window.location.href='project-details.html?id=${project.id}'" style="cursor: pointer;">
+                    <div class="project-info">
+                        <h3 class="project-name">${project.project_name || project.name}</h3>
+                        <span class="badge badge-blue">In Progress</span>
+                        <p class="project-meta">• Updated ${new Date(project.updated_at || project.start_date).toLocaleDateString()}</p>
+                    </div>
+                    <div class="project-actions">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatDateRange(start, end) {
+            const options = { month: 'short', day: 'numeric' };
+            return `${start.toLocaleDateString('en-US', options)} - ${end.toLocaleDateString('en-US', options)}`;
+        }
+
+        function showError(message) {
+            console.error('ERROR:', message);
+            // You can implement a toast notification here
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Show admin link only for admin users
+        if (localStorage.getItem('userRole') === 'admin') {
+            document.getElementById('adminLink').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

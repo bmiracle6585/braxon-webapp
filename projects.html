@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/auth.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Braxon Industries</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <img src="assets/logo.svg" alt="Braxon Industries Logo" class="braxon-logo-sidebar">
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <a href="dashboard" class="nav-item">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="projects" class="nav-item active">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span>Projects</span>
+                </a>
+
+                <a href="tech-portal" class="nav-item" id="techPortalNavLink">
+    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+    </svg>
+    <span>Tech Portal</span>
+    <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; margin-left: auto;">
+        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+    </svg>
+</a>
+
+<a href="/admin-console" class="nav-item" id="adminLink" style="display: none;">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Admin Console</span>
+    </a>
+        </nav>
+    </div>
+            </nav>
+
+            <!-- User Profile & Sign Out -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-name">Blake Miracle</div>
+                    <div class="user-email">bmiracle6585@gmail.com</div>
+                    <div class="user-role">Admin</div>
+                </div>
+                <button class="btn-signout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <header class="page-header-projects">
+                <div>
+                    <h1 class="page-title">Projects</h1>
+                    <p class="page-subtitle">View and manage all construction projects</p>
+                </div>
+                <button class="btn-new-project" id="newProjectBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    New Project
+                </button>
+            </header>
+
+            <!-- Search and Filter Bar -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="searchProjects" 
+                        placeholder="Search projects..." 
+                        class="search-input"
+                    >
+                </div>
+                <div class="filter-dropdown">
+                    <select id="statusFilter" class="status-filter-select">
+                        <option value="all">All Statuses</option>
+                        <option value="planning">Planning</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="review">Review</option>
+                        <option value="completed">Completed</option>
+                        <option value="on-hold">On Hold</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Recently Viewed Section -->
+            <div class="section-card">
+                <div class="section-header-collapsible" id="recentlyViewedHeader">
+                    <div class="section-header-content">
+                        <h2 class="section-title">Recently Viewed</h2>
+                        <span class="project-count" id="recentlyViewedCount">0 projects</span>
+                    </div>
+                    <button class="collapse-toggle" id="toggleRecentlyViewed">
+                        <svg class="collapse-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="recently-viewed-content" id="recentlyViewedContent">
+                    <div class="projects-grid" id="recentlyViewedGrid">
+    <!-- Will be populated by JavaScript from localStorage -->
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Projects Section -->
+            <div class="section-card">
+                <h2 class="section-title">All Projects</h2>
+                
+                <div class="projects-grid" id="allProjectsGrid">
+                    <!-- Projects will be filtered and displayed here -->
+                    <div class="empty-state-large">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <h3>No projects found</h3>
+                        <p>Try adjusting your search or filter to find what you're looking for.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+  <!-- New Project Modal -->
+    <div class="modal-overlay" id="newProjectModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Project</h2>
+                <button class="modal-close" id="closeModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createProjectForm" class="project-form">
+    <!-- Row 1: Customer and POC -->
+    <div class="form-row">
+    <div class="form-group">
+        <label for="customerCompany">Customer Company *</label>
+        <select id="customerCompany" name="customer_company" required>
+            <option value="">Select company...</option>
+            <!-- Will be populated by JavaScript -->
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="customerContact">Customer Contact *</label>
+        <select id="customerContact" name="customer_id" required>
+            <option value="">Select company first...</option>
+            <!-- Will be populated after company selected -->
+        </select>
+    </div>
+</div>
+
+    <!-- Row 2: Project Name and Scope of Work -->
+    <div class="form-row">
+        <div class="form-group">
+            <label for="projectName">Project Name *</label>
+            <input type="text" id="projectName" name="project_name" 
+                   placeholder="Enter project name" required>
+        </div>
+        <div class="form-group">
+            <label for="scopeOfWork">Scope of Work *</label>
+            <select id="scopeOfWork" name="scope_of_work" required>
+                <option value="">Select scope...</option>
+                <option value="New Installation">New Installation</option>
+                <option value="Upgrade">Upgrade</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Decommission">Decommission</option>
+                <option value="Survey">Survey</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Row 3: Status -->
+    <div class="form-row">
+        <div class="form-group">
+            <label for="projectStatus">Status *</label>
+            <select id="projectStatus" name="status" required>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On Hold</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <!-- Empty space for visual balance -->
+        </div>
+    </div>
+
+    <!-- Row 4: Site Names -->
+    <div class="form-row">
+        <div class="form-group">
+            <label for="siteAName">Site A Name *</label>
+            <input type="text" id="siteAName" name="site_a_name" 
+                   placeholder="Site A name" required>
+        </div>
+        <div class="form-group">
+            <label for="siteBName">Site B Name</label>
+            <input type="text" id="siteBName" name="site_b_name" 
+                   placeholder="Site B name (optional)">
+        </div>
+    </div>
+
+    <!-- Row 5: Site Locations -->
+    <div class="form-row">
+        <div class="form-group">
+            <label for="siteALocation">Site A Location (DMS) *</label>
+            <input type="text" id="siteALocation" name="site_a_location" 
+                   placeholder="34 27 54.93, -109 37 41.59" required>
+            <small class="form-hint">Format: DD MM SS.SS, -DDD MM SS.SS</small>
+        </div>
+        <div class="form-group">
+            <label for="siteBLocation">Site B Location (DMS)</label>
+            <input type="text" id="siteBLocation" name="site_b_location" 
+                   placeholder="34 36 6.11, -109 37 44.73">
+            <small class="form-hint">Optional second site coordinates</small>
+        </div>
+    </div>
+
+    <!-- Row 6: Dates -->
+    <div class="form-row">
+        <div class="form-group">
+            <label for="startDate">Start Date *</label>
+            <input type="date" id="startDate" name="start_date" required>
+        </div>
+        <div class="form-group">
+            <label for="endDate">Expected Completion Date</label>
+            <input type="date" id="endDate" name="end_date">
+        </div>
+    </div>
+
+    <!-- Row 7: Description -->
+    <div class="form-group">
+        <label for="projectDescription">Project Description</label>
+        <textarea id="projectDescription" name="description" 
+                  placeholder="Project description and notes" rows="4"></textarea>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeCreateProjectModal()">
+            Cancel
+        </button>
+        <button type="submit" class="btn-primary">
+            Create Project
+        </button>
+    </div>
+    <!-- File Upload Section -->
+<div class="form-group">
+    <label>Project Documents</label>
+    <div class="file-upload-area" id="fileUploadArea">
+        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx" style="display: none;">
+        
+        <div class="upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+        </div>
+        
+        <div class="upload-text">
+            <p class="upload-main">Drop files here or <span class="upload-link">browse</span></p>
+            <p class="upload-hint">PDF, DOC, DOCX, XLS, XLSX (Max 50MB)</p>
+        </div>
+        
+        <div class="upload-actions">
+            <button type="button" class="btn-upload-paste" id="pasteBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                Paste from Clipboard
+            </button>
+        </div>
+    </div>
+    
+    <!-- File Preview List -->
+    <div id="filePreviewList" class="file-preview-list" style="display: none;"></div>
+</div>
+</form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/projects.js"></script>
+    <script src="JS/tech-portal-access.js"></script>
+    <script>
+  // Show admin link only for admin users
+  if (localStorage.getItem('userRole') === 'admin') {
+    const adminLink = document.getElementById('adminLink');
+    if (adminLink) {
+      adminLink.style.display = 'flex';
+    }
+  }
+
+// Load customers into dropdown
+// Load unique company names into first dropdown
+async function loadCustomersDropdown() {
+    try {
+        const response = await fetchWithAuth('/api/customers');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            const select = document.getElementById('customerCompany');
+            select.innerHTML = '<option value="">Select company...</option>';
+            
+            // Get unique company names
+            const uniqueCompanies = [...new Set(data.data.map(c => c.name))];
+            uniqueCompanies.sort();
+            
+            uniqueCompanies.forEach(companyName => {
+                const option = document.createElement('option');
+                option.value = companyName;
+                option.textContent = companyName;
+                select.appendChild(option);
+            });
+            
+            console.log('✅ Loaded', uniqueCompanies.length, 'companies into dropdown');
+        }
+    } catch (error) {
+        console.error('❌ Error loading companies:', error);
+    }
+}
+
+// Load contacts for selected company into second dropdown
+async function loadContactsForCompany(companyName) {
+    try {
+        const response = await fetchWithAuth('/api/customers');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+            const select = document.getElementById('customerContact');
+            select.innerHTML = '<option value="">Select contact...</option>';
+            
+            // Filter contacts for this company
+            const contacts = data.data.filter(c => c.name === companyName);
+            
+            if (contacts.length === 0) {
+                select.innerHTML = '<option value="">No contacts found</option>';
+                return;
+            }
+            
+            // Sort by contact name
+            contacts.sort((a, b) => {
+                const nameA = a.contact_name || '';
+                const nameB = b.contact_name || '';
+                return nameA.localeCompare(nameB);
+            });
+            
+            contacts.forEach(contact => {
+                const option = document.createElement('option');
+                option.value = contact.id;
+                option.textContent = `${contact.contact_name} (${contact.contact_email || 'no email'})`;
+                select.appendChild(option);
+            });
+            
+            console.log('✅ Loaded', contacts.length, 'contacts for', companyName);
+        }
+    } catch (error) {
+        console.error('❌ Error loading contacts:', error);
+    }
+}
+
+// When company is selected, load its contacts
+document.getElementById('customerCompany').addEventListener('change', function() {
+    const companyName = this.value;
+    if (companyName) {
+        loadContactsForCompany(companyName);
+    } else {
+        document.getElementById('customerContact').innerHTML = '<option value="">Select company first...</option>';
+    }
+});
+
+
+// Open new project modal
+document.getElementById('newProjectBtn').addEventListener('click', async function() {
+    console.log('🔵 Opening new project modal...');
+    await loadCustomersDropdown(); // Load customers when modal opens
+    document.getElementById('newProjectModal').style.display = 'flex';
+});
+
+// Close modal function
+function closeCreateProjectModal() {
+    document.getElementById('newProjectModal').style.display = 'none';
+    document.getElementById('createProjectForm').reset();
+}
+
+// Close button
+document.getElementById('closeModal').addEventListener('click', closeCreateProjectModal);
+
+// Close on overlay click
+document.getElementById('newProjectModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCreateProjectModal();
+    }
+});
+
+// Handle form submission
+document.getElementById('createProjectForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        customer_id: document.getElementById('customerContact').value, // ✅ Changed
+        project_name: document.getElementById('projectName').value,
+        scope_of_work: document.getElementById('scopeOfWork').value,
+        status: document.getElementById('projectStatus').value,
+        site_a_name: document.getElementById('siteAName').value,
+        site_b_name: document.getElementById('siteBName').value || null,
+        site_a_location: document.getElementById('siteALocation').value,
+        site_b_location: document.getElementById('siteBLocation').value || null,
+        start_date: document.getElementById('startDate').value,
+        end_date: document.getElementById('endDate').value || null,
+        description: document.getElementById('projectDescription').value || null
+    };
+    
+    try {
+        const response = await fetchWithAuth('/api/projects', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Project created successfully!');
+            closeCreateProjectModal();
+            window.location.reload(); // Reload to show new project
+        } else {
+            alert('Failed to create project: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error creating project:', error);
+        alert('An error occurred while creating the project');
+    }
+});
+
+</script>
+</body>
+</html>

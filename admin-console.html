@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console - Braxon</title>
+    <link rel="stylesheet" href="CSS/Styles.css">
+    <style>
+        .logo-container {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .braxon-logo {
+            width: 180px;
+            height: auto;
+        }
+
+        .admin-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .admin-header h1 {
+            color: #1a1a1a;
+            font-size: 1.75rem;
+            margin: 0 0 0.25rem 0;
+            white-space: nowrap;
+        }
+
+        .header-subtitle {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            padding: 0.4rem 0.85rem !important;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem !important;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+            max-width: 150px !important;
+        }
+
+        .btn-primary span {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+        }
+
+        /* Tab Navigation */
+        .admin-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .admin-tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.2s;
+        }
+
+        .admin-tab:hover {
+            color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .admin-tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .users-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .users-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-admin { background: #dc3545; color: white; }
+        .badge-pm { background: #007bff; color: white; }
+        .badge-qa { background: #ffc107; color: #000; }
+        .badge-field { background: #28a745; color: white; }
+        .badge-foreman { background: #17a2b8; color: white; }
+        .badge-customer { background: #6f42c1; color: white; }
+        .badge-active { background: #28a745; color: white; }
+        .badge-inactive { background: #6c757d; color: white; }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view-profile {
+            background: linear-gradient(135deg, #dc143c, #8b0000);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-view-profile:hover {
+            background: linear-gradient(135deg, #b8102e, #6d0000);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(220, 20, 60, 0.3);
+        }
+
+        .btn-edit { background: #007bff; color: white; }
+        .btn-edit:hover { 
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:hover { 
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-sm {
+                width: 100%;
+            }
+        }
+        .badge-available { background: #28a745; color: white; }
+.badge-assigned { background: #007bff; color: white; }
+.badge-maintenance { background: #ffc107; color: #000; }
+.badge-out-of-service { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <img src="assets/logo.svg" alt="Braxon Industries Logo" class="braxon-logo-sidebar">
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="projects.html" class="nav-item">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span>Projects</span>
+                </a>
+
+                <a href="tech-portal.html" class="nav-item" id="techPortalNavLink">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    <span>Tech Portal</span>
+                </a>
+
+                <a href="/admin-console" class="nav-item active">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Admin Console</span>
+                </a>
+            </nav>
+
+            <!-- User Profile & Sign Out -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-name" id="currentUserName">Blake Miracle</div>
+                    <div class="user-email" id="currentUserEmail">bmiracle6585@gmail.com</div>
+                    <div class="user-role" id="currentUserRole">Admin</div>
+                </div>
+                <button class="btn-signout" onclick="logout()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="admin-container">
+            <!-- Tab Navigation -->
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="users">User Management</button>
+                <button class="admin-tab" data-tab="customers">Customer Management</button>
+                <button class="admin-tab" data-tab="vehicles">Vehicle Management</button>
+
+            </div>
+
+            <!-- USER MANAGEMENT TAB -->
+            <div id="users-tab" class="tab-content active">
+                <div class="admin-header">
+                    <div>
+                        <h1>User Management</h1>
+                        <p class="header-subtitle">Manage user accounts and permissions</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreateUserModal()">
+                        <span>+</span> Add User
+                    </button>
+                </div>
+
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Company</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    Loading users...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CUSTOMER MANAGEMENT TAB -->
+            <div id="customers-tab" class="tab-content">
+                <div class="admin-header">
+                    <div>
+                        <h1>Customer Management</h1>
+                        <p class="header-subtitle">Manage customer companies and contacts</p>
+                    </div>
+                    <button class="btn-primary" onclick="openCreateCustomerModal()">
+                        <span>+</span> Add Contact
+                    </button>
+                </div>
+
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company Name</th>
+                                <th>Contact Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Projects</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    Loading customers...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="vehicles-tab" class="tab-content">
+    <div class="admin-header">
+        <div>
+            <h1>Vehicle Management</h1>
+            <p class="header-subtitle">Manage company vehicles and assignments</p>
+        </div>
+        <button class="btn-primary" onclick="openCreateVehicleModal()">
+            <span>+</span> Add Vehicle
+        </button>
+    </div>
+
+    <div class="users-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>License Plate</th>
+                    <th>VIN</th>
+                    <th>Assigned To</th>
+                    <th>Status</th>
+                    <th>Last Inspection</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="vehiclesTableBody">
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        Loading vehicles...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+        </div>
+    </main>
+
+    <!-- USER MODAL -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <h2 id="userModalTitle">Add New User</h2>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <input type="hidden" id="userId">
+                
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input type="text" id="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password <span id="passwordHint">*</span></label>
+                    <input type="password" id="password">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role *</label>
+                    <select id="role" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Administrator</option>
+                        <option value="pm">Project Manager</option>
+                        <option value="foreman">Foreman</option>
+                        <option value="field">Field Tech</option>
+                        <option value="qa">QA Tech</option>
+                    </select>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeUserModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CUSTOMER MODAL -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <h2 id="customerModalTitle">Add New Contact</h2>
+            <form id="customerForm" onsubmit="saveCustomer(event)">
+                <input type="hidden" id="customerId">
+                
+                <div class="form-group">
+                    <label for="customerName">Company Name *</label>
+                    <select id="customerName" required>
+                        <option value="">Select company...</option>
+                        <option value="other">➕ Other (add new company)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="customCompanyGroup" style="display: none;">
+                    <label for="customCompanyName">Enter Company Name *</label>
+                    <input type="text" id="customCompanyName" placeholder="Type company name...">
+                </div>
+
+                <div class="form-group">
+                    <label for="contactName">Contact Name *</label>
+                    <input type="text" id="contactName" required placeholder="John Smith">
+                </div>
+
+                <div class="form-group">
+                    <label for="contactEmail">Contact Email *</label>
+                    <input type="email" id="contactEmail" required placeholder="john@company.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="contactPhone">Contact Phone</label>
+                    <input type="tel" id="contactPhone" placeholder="555-0123">
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeCustomerModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Contact</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="vehicleModal" class="modal">
+    <div class="modal-content">
+        <h2 id="vehicleModalTitle">Add New Vehicle</h2>
+        <form id="vehicleForm" onsubmit="saveVehicle(event)">
+            <input type="hidden" id="vehicleId">
+            
+            <div class="form-group">
+                <label for="vehicleMake">Make *</label>
+                <input type="text" id="vehicleMake" required placeholder="Ford, Chevrolet, Ram">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleModel">Model *</label>
+                <input type="text" id="vehicleModel" required placeholder="F-150, Silverado, ProMaster">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleYear">Year *</label>
+                <input type="number" id="vehicleYear" required min="1990" max="2030" placeholder="2024">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleLicensePlate">License Plate *</label>
+                <input type="text" id="vehicleLicensePlate" required placeholder="ABC-1234">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleVin">VIN *</label>
+                <input type="text" id="vehicleVin" required placeholder="1HGBH41JXMN109186" maxlength="17">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleColor">Color</label>
+                <input type="text" id="vehicleColor" placeholder="White, Black, Silver">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleMileage">Current Mileage</label>
+                <input type="number" id="vehicleMileage" placeholder="50000">
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleStatus">Status *</label>
+                <select id="vehicleStatus" required>
+                    <option value="active">Active</option>
+                    <option value="maintenance">In Maintenance</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleAssignedTo">Assigned To</label>
+                <select id="vehicleAssignedTo">
+                    <option value="">Unassigned</option>
+                </select>
+            </div>
+            
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" onclick="closeVehicleModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Vehicle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <script src="JS/app.js"></script>
+<script>
+    let allUsers = [];
+    let allCustomers = [];
+    let allVehicles = [];
+
+    // Check admin access
+    if (localStorage.getItem('userRole') !== 'admin') {
+        window.location.href = '/dashboard';
+    }
+
+    // Tab Switching
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        });
+    });
+
+    // Initialize
+    async function init() {
+        await loadCustomers();
+        await loadUsers();
+        await loadCustomerDropdown();
+        await loadVehicles();
+        await loadUserDropdownForVehicles();
+    }
+
+    // ==================== USER MANAGEMENT ====================
+
+    async function loadUsers() {
+        try {
+            const response = await fetchWithAuth('/api/users');
+            const data = await response.json();
+
+            if (data.success) {
+                allUsers = data.data;
+                renderUsersTable();
+            }
+        } catch (error) {
+            console.error('Load users error:', error);
+            document.getElementById('usersTableBody').innerHTML = 
+                '<tr><td colspan="7" class="empty-state">Error loading users</td></tr>';
+        }
+    }
+
+    function renderUsersTable() {
+        const tbody = document.getElementById('usersTableBody');
+        
+        if (allUsers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = allUsers.map(user => {
+            const companyName = 'Braxon Industries';
+            
+            return `
+                <tr>
+                    <td>${user.first_name || ''} ${user.last_name || ''}</td>
+                    <td>${user.email}</td>
+                    <td>${user.username}</td>
+                    <td><span class="badge badge-${user.role}">${user.role.toUpperCase()}</span></td>
+                    <td>${companyName}</td>
+                    <td><span class="badge badge-${user.is_active ? 'active' : 'inactive'}">
+                        ${user.is_active ? 'Active' : 'Inactive'}
+                    </span></td>
+                    <td class="action-buttons">
+                        <button class="btn-sm btn-view-profile" onclick="viewUserProfile(${user.id})">
+                            👤 Profile
+                        </button>
+                        <button class="btn-sm btn-edit" onclick="editUser(${user.id})">Edit</button>
+                        <button class="btn-sm btn-delete" onclick="deleteUser(${user.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function viewUserProfile(userId) {
+        window.location.href = `/user-profile.html?userId=${userId}`;
+    }
+
+    function openCreateUserModal() {
+        document.getElementById('userModalTitle').textContent = 'Add New Braxon Employee';
+        document.getElementById('userForm').reset();
+        document.getElementById('userId').value = '';
+        document.getElementById('password').required = true;
+        document.getElementById('passwordHint').textContent = '*';
+        document.getElementById('userModal').style.display = 'flex';
+    }
+
+    async function editUser(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+
+        document.getElementById('userModalTitle').textContent = 'Edit User';
+        document.getElementById('userId').value = user.id;
+        document.getElementById('firstName').value = user.first_name || '';
+        document.getElementById('lastName').value = user.last_name || '';
+        document.getElementById('username').value = user.username;
+        document.getElementById('email').value = user.email;
+        document.getElementById('phone').value = user.phone || '';
+        document.getElementById('role').value = user.role;
+        
+        document.getElementById('password').value = '';
+        document.getElementById('password').required = false;
+        document.getElementById('passwordHint').textContent = '(leave blank to keep current)';
+
+        document.getElementById('userModal').style.display = 'flex';
+    }
+
+    async function saveUser(event) {
+        event.preventDefault();
+        
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        
+        if (!firstName || !lastName) {
+            alert('First name and last name are required');
+            return;
+        }
+        
+        const userData = {
+            username: document.getElementById('username').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            first_name: firstName,
+            last_name: lastName,
+            full_name: `${firstName} ${lastName}`,
+            role: document.getElementById('role').value,
+            phone: document.getElementById('phone').value.trim() || null,
+            company: 'Braxon Industries',
+            is_active: true
+        };
+
+        const password = document.getElementById('password').value;
+        if (password && password.trim()) {
+            userData.password = password;
+        }
+
+        try {
+            const userId = document.getElementById('userId').value;
+            const url = userId ? `/api/users/${userId}` : '/api/users';
+            const method = userId ? 'PUT' : 'POST';
+
+            const response = await fetchWithAuth(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(userId ? '✅ User updated successfully' : '✅ User created successfully');
+                closeUserModal();
+                await loadUsers();
+            } else {
+                alert('❌ ' + (data.message || 'Error saving user'));
+            }
+        } catch (error) {
+            console.error('Save user error:', error);
+            alert('❌ Error saving user: ' + error.message);
+        }
+    }
+
+    async function deleteUser(userId) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+
+        try {
+            const response = await fetchWithAuth(`/api/users/${userId}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('User deleted successfully');
+                await loadUsers();
+            } else {
+                alert(data.message || 'Error deleting user');
+            }
+        } catch (error) {
+            console.error('Delete user error:', error);
+            alert('Error deleting user');
+        }
+    }
+
+    function closeUserModal() {
+        document.getElementById('userModal').style.display = 'none';
+    }
+
+    // ==================== CUSTOMER MANAGEMENT ====================
+
+    async function loadCustomers() {
+        try {
+            const response = await fetchWithAuth('/api/customers');
+            const data = await response.json();
+
+            if (data.success) {
+                allCustomers = data.data;
+                renderCustomersTable();
+            }
+        } catch (error) {
+            console.error('Load customers error:', error);
+            document.getElementById('customersTableBody').innerHTML = 
+                '<tr><td colspan="6" class="empty-state">Error loading customers</td></tr>';
+        }
+    }
+
+    function renderCustomersTable() {
+        const tbody = document.getElementById('customersTableBody');
+        
+        if (allCustomers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No customers found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = allCustomers.map(customer => `
+            <tr>
+                <td><strong>${customer.name}</strong></td>
+                <td>${customer.contact_name || '-'}</td>
+                <td>${customer.contact_email || '-'}</td>
+                <td>${customer.contact_phone || '-'}</td>
+                <td>${customer.project_count || 0}</td>
+                <td class="action-buttons">
+                    <button class="btn-sm btn-edit" onclick="editCustomer(${customer.id})">Edit</button>
+                    <button class="btn-sm btn-delete" onclick="deleteCustomer(${customer.id})">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function loadCustomerDropdown() {
+        try {
+            const response = await fetchWithAuth('/api/customers');
+            const data = await response.json();
+
+            if (data.success) {
+                const dropdown = document.getElementById('customerName');
+                
+                dropdown.innerHTML = '<option value="">Select company...</option>';
+                
+                const uniqueCustomers = [];
+                const seenNames = new Set();
+
+                data.data.forEach(customer => {
+                    const name = customer.name;
+                    if (!seenNames.has(name)) {
+                        seenNames.add(name);
+                        uniqueCustomers.push(customer);
+                    }
+                });
+
+                const sortedCustomers = uniqueCustomers.sort((a, b) => 
+                    a.name.localeCompare(b.name)
+                );
+                
+                sortedCustomers.forEach(customer => {
+                    const option = document.createElement('option');
+                    option.value = customer.name;
+                    option.textContent = customer.name;
+                    dropdown.appendChild(option);
+                });
+                
+                const otherOption = document.createElement('option');
+                otherOption.value = 'other';
+                otherOption.textContent = '➕ Other (add new company)';
+                dropdown.appendChild(otherOption);
+            }
+        } catch (error) {
+            console.error('Error loading customer dropdown:', error);
+        }
+    }
+
+    async function openCreateCustomerModal() {
+        document.getElementById('customerModalTitle').textContent = 'Add New Contact';
+        document.getElementById('customerForm').reset();
+        document.getElementById('customerId').value = '';
+        document.getElementById('customCompanyGroup').style.display = 'none';
+        
+        await loadCustomerDropdown();
+        document.getElementById('customerModal').style.display = 'flex';
+    }
+
+    async function editCustomer(customerId) {
+        try {
+            const response = await fetchWithAuth(`/api/customers/${customerId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const customer = data.data;
+                
+                document.getElementById('customerModalTitle').textContent = 'Edit Contact';
+                document.getElementById('customerId').value = customer.id;
+                
+                const dropdown = document.getElementById('customerName');
+                const existingOption = Array.from(dropdown.options).find(opt => opt.value === customer.name);
+
+                if (existingOption) {
+                    dropdown.value = customer.name;
+                    document.getElementById('customCompanyGroup').style.display = 'none';
+                } else {
+                    dropdown.value = 'other';
+                    document.getElementById('customCompanyGroup').style.display = 'block';
+                    document.getElementById('customCompanyName').value = customer.name;
+                }
+
+                document.getElementById('contactName').value = customer.contact_name || '';
+                document.getElementById('contactEmail').value = customer.contact_email || '';
+                document.getElementById('contactPhone').value = customer.contact_phone || '';
+                document.getElementById('vehicleModal').style.display = 'flex';
+            }
+        } catch (error) {
+            console.error('Load customer error:', error);
+            alert('Error loading customer details');
+        }
+    }
+
+    async function saveCustomer(event) {
+        event.preventDefault();
+        
+        const customerId = document.getElementById('customerId').value;
+        
+        let companyName = document.getElementById('customerName').value;
+        if (companyName === 'other') {
+            companyName = document.getElementById('customCompanyName').value;
+        }
+
+        const customerData = {
+            name: companyName,
+            contact_name: document.getElementById('contactName').value,
+            contact_email: document.getElementById('contactEmail').value,
+            contact_phone: document.getElementById('contactPhone').value
+        };
+
+        try {
+            const url = customerId 
+                ? `/api/customers/${customerId}` 
+                : '/api/customers';
+            
+            const response = await fetchWithAuth(url, {
+                method: customerId ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customerData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(customerId ? 'Contact updated successfully' : 'Contact added successfully');
+                closeCustomerModal();
+                await loadCustomers();
+                await loadCustomerDropdown();
+            } else {
+                alert(data.message || 'Failed to save contact');
+            }
+        } catch (error) {
+            console.error('Error saving contact:', error);
+            alert('An error occurred: ' + error.message);
+        }
+    }
+
+    async function deleteCustomer(customerId) {
+        if (!confirm('Are you sure you want to delete this contact?')) return;
+
+        try {
+            const response = await fetchWithAuth(`/api/customers/${customerId}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Contact deleted successfully');
+                await loadCustomers();
+                await loadCustomerDropdown();
+            } else {
+                alert(data.message || 'Failed to delete contact');
+            }
+        } catch (error) {
+            console.error('Delete customer error:', error);
+            alert('An error occurred while deleting the contact');
+        }
+    }
+
+    function closeCustomerModal() {
+        document.getElementById('customerModal').style.display = 'none';
+        document.getElementById('customerForm').reset();
+    }
+
+    document.getElementById('customerName').addEventListener('change', function() {
+        const customGroup = document.getElementById('customCompanyGroup');
+        const customInput = document.getElementById('customCompanyName');
+        
+        if (this.value === 'other') {
+            customGroup.style.display = 'block';
+            customInput.required = true;
+        } else {
+            customGroup.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
+        }
+    });
+
+    // ==================== VEHICLE MANAGEMENT ====================
+
+    async function loadVehicles() {
+        try {
+            const response = await fetchWithAuth('/api/vehicles');
+            const data = await response.json();
+
+            if (data.success) {
+                allVehicles = data.data;
+                renderVehiclesTable();
+            }
+        } catch (error) {
+            console.error('Load vehicles error:', error);
+            document.getElementById('vehiclesTableBody').innerHTML = 
+                '<tr><td colspan="7" class="empty-state">Error loading vehicles</td></tr>';
+        }
+    }
+
+    function renderVehiclesTable() {
+        const tbody = document.getElementById('vehiclesTableBody');
+        
+        if (allVehicles.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No vehicles found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = allVehicles.map(vehicle => {
+            const assignedUser = vehicle.assigned_user_id 
+                ? allUsers.find(u => u.id === vehicle.assigned_user_id) 
+                : null;
+            
+            const assignedName = assignedUser 
+                ? `${assignedUser.first_name} ${assignedUser.last_name}` 
+                : 'Unassigned';
+
+            const statusBadge = vehicle.status === 'active' ? 'assigned' : vehicle.status;
+            
+            return `
+                <tr>
+                    <td><strong>${vehicle.year} ${vehicle.make} ${vehicle.model}</strong></td>
+                    <td>${vehicle.license_plate}</td>
+                    <td><small>${vehicle.vin}</small></td>
+                    <td>${assignedName}</td>
+                    <td><span class="badge badge-${statusBadge}">${vehicle.status.toUpperCase()}</span></td>
+                    <td>${vehicle.last_inspection_date || '-'}</td>
+                    <td class="action-buttons">
+                        <button class="btn-sm btn-edit" onclick="editVehicle(${vehicle.id})">Edit</button>
+                        <button class="btn-sm btn-delete" onclick="deleteVehicle(${vehicle.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function loadUserDropdownForVehicles() {
+        const dropdown = document.getElementById('vehicleAssignedTo');
+        dropdown.innerHTML = '<option value="">Unassigned</option>';
+        
+        allUsers.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = `${user.first_name} ${user.last_name} (${user.role})`;
+            dropdown.appendChild(option);
+        });
+    }
+
+    function openCreateVehicleModal() {
+        document.getElementById('vehicleModalTitle').textContent = 'Add New Vehicle';
+        document.getElementById('vehicleForm').reset();
+        document.getElementById('vehicleId').value = '';
+        loadUserDropdownForVehicles();
+        document.getElementById('vehicleModal').style.display = 'flex';
+    }
+
+    async function editVehicle(vehicleId) {
+        const vehicle = allVehicles.find(v => v.id === vehicleId);
+        if (!vehicle) return;
+
+        document.getElementById('vehicleModalTitle').textContent = 'Edit Vehicle';
+        document.getElementById('vehicleId').value = vehicle.id;
+        document.getElementById('vehicleMake').value = vehicle.make;
+        document.getElementById('vehicleModel').value = vehicle.model;
+        document.getElementById('vehicleYear').value = vehicle.year;
+        document.getElementById('vehicleLicensePlate').value = vehicle.license_plate;
+        document.getElementById('vehicleVin').value = vehicle.vin;
+        document.getElementById('vehicleColor').value = vehicle.color || '';
+        document.getElementById('vehicleMileage').value = vehicle.current_mileage || '';
+        document.getElementById('vehicleStatus').value = vehicle.status;
+        document.getElementById('vehicleAssignedTo').value = vehicle.assigned_user_id || '';
+
+        await loadUserDropdownForVehicles();
+        document.getElementById('vehicleModal').style.display = 'flex';
+    }
+
+    async function saveVehicle(event) {
+        event.preventDefault();
+        
+        const vehicleData = {
+            make: document.getElementById('vehicleMake').value,
+            model: document.getElementById('vehicleModel').value,
+            year: document.getElementById('vehicleYear').value,
+            license_plate: document.getElementById('vehicleLicensePlate').value,
+            vin: document.getElementById('vehicleVin').value.toUpperCase(),
+            color: document.getElementById('vehicleColor').value || null,
+            current_mileage: document.getElementById('vehicleMileage').value || null,
+            status: document.getElementById('vehicleStatus').value,
+            assigned_user_id: document.getElementById('vehicleAssignedTo').value || null
+        };
+
+        try {
+            const vehicleId = document.getElementById('vehicleId').value;
+            const url = vehicleId ? `/api/vehicles/${vehicleId}` : '/api/vehicles';
+            const method = vehicleId ? 'PUT' : 'POST';
+
+            const response = await fetchWithAuth(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(vehicleData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(vehicleId ? '✅ Vehicle updated successfully' : '✅ Vehicle added successfully');
+                closeVehicleModal();
+                await loadVehicles();
+            } else {
+                alert('❌ ' + (data.message || 'Error saving vehicle'));
+            }
+        } catch (error) {
+            console.error('Save vehicle error:', error);
+            alert('❌ Error saving vehicle: ' + error.message);
+        }
+    }
+
+    async function deleteVehicle(vehicleId) {
+        if (!confirm('Are you sure you want to delete this vehicle?')) return;
+
+        try {
+            const response = await fetchWithAuth(`/api/vehicles/${vehicleId}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Vehicle deleted successfully');
+                await loadVehicles();
+            } else {
+                alert(data.message || 'Error deleting vehicle');
+            }
+        } catch (error) {
+            console.error('Delete vehicle error:', error);
+            alert('Error deleting vehicle');
+        }
+    }
+
+    function closeVehicleModal() {
+        document.getElementById('vehicleModal').style.display = 'none';
+    }
+
+    // ==================== COMMON ====================
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = '/';
+    }
+
+    init();
+</script>
+</body>
+</html>

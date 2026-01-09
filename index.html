@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Braxon Industries - Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-wrapper">
+                <img src="assets/logo.svg" alt="Braxon Industries Logo" class="braxon-logo">
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="login-form-wrapper">
+            <div class="login-form-container">
+                <h2 class="form-title">Sign In</h2>
+                <p class="form-subtitle">Access is restricted to authorized personnel only</p>
+                
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="you@example.com"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Sign In</button>
+                    
+                    <div class="forgot-password">
+                        <a href="#" class="link-secondary">Forgot your password?</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Authorization Notice -->
+            <div class="alert-warning">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <strong>Authorized Access Only</strong>
+                    <p>All user accounts are created and managed by Braxon administrators. If you need access, please contact your system administrator.</p>
+                </div>
+            </div>
+
+            <p class="footer-text">Secure project management and documentation platform</p>
+        </div>
+    </div>
+    <script src="JS/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Portal - Braxon Project Management</title>
+    <link rel="stylesheet" href="CSS/Styles.css">
+    
+    <!-- Leaflet CSS (for consistency, even though not using map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-content">
+        <!-- Logo -->
+        <div class="sidebar-logo">
+            <img src="assets/logo.svg" alt="Braxon Industries Logo" class="braxon-logo-sidebar">
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <a href="/dashboard" class="nav-item">
+                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            
+            <a href="/projects" class="nav-item">
+                <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <span>Projects</span>
+            </a>
+
+            <a href="/tech-portal" class="nav-item active" id="techPortalNavLink">
+    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+    </svg>
+    <span>Tech Portal</span>
+    <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; margin-left: auto;">
+        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+    </svg>
+</a>
+<a href="/admin-console" class="nav-item" id="adminLink" style="display: none;">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Admin Console</span>
+    </a>
+        </nav>
+    </div>
+
+    <!-- User Profile (Bottom) -->
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">BM</div>
+            <div class="user-details">
+                <div class="user-name">Blake Miracle</div>
+                <div class="user-email">blake@braxon.net</div>
+                <div class="user-role">Admin</div>
+            </div>
+        </div>
+        <button class="btn-signout" onclick="window.location.href='Index.html'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+        </button>
+    </div>
+</aside>
+
+        <!-- User Profile (Bottom) -->
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">BM</div>
+                <div class="user-info">
+                    <div class="user-name">Blake Miracle</div>
+                    <div class="user-email">blake@braxon.net</div>
+                </div>
+            </div>
+            <button class="btn-icon" id="signOutBtn">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    Tech Portal
+                </h1>
+                <p class="page-subtitle">Video training library for field personnel</p>
+            </div>
+
+            <!-- ✅ ADD ADMIN BUTTON (only visible for admin role) -->
+    <button class="btn-primary" id="manageVideosBtn" style="display: none;">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+        Manage Videos
+    </button>
+</div>
+            
+            <!-- Search Bar -->
+            <div class="tech-portal-search">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" id="videoSearch" placeholder="Search for training videos...">
+            </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="category-filter-bar">
+    <button class="filter-btn active" data-category="all">
+        All Videos
+    </button>
+    <button class="filter-btn" data-category="antenna">
+        Antenna Installation
+    </button>
+    <button class="filter-btn" data-category="waveguide">
+        Waveguide
+    </button>
+    <button class="filter-btn" data-category="radio">
+        Radio Equipment
+    </button>
+    <button class="filter-btn" data-category="fiber">
+        Fiber/Coax
+    </button>
+    <button class="filter-btn" data-category="safety">
+        Safety Procedures
+    </button>
+    <button class="filter-btn" data-category="troubleshooting">
+        Troubleshooting
+    </button>
+</div>
+
+        <!-- Video Grid -->
+        <div class="video-library-grid" id="videoGrid">
+            <!-- Videos will be dynamically loaded by JavaScript -->
+        </div>
+
+        <!-- Empty State (shown when no results) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <svg width="64" height="64" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <h3>No videos found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+        </div>
+    </main>
+
+    <!-- Video Player Modal -->
+    <div class="modal" id="videoModal">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="video-modal-content">
+            <button class="modal-close-btn" id="closeVideoModal">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+            
+            <div class="video-player-container">
+                <iframe id="videoPlayer" 
+                        width="100%" 
+                        height="100%" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+            
+            <div class="video-details">
+                <h2 id="videoTitle"></h2>
+                <p id="videoDescription"></p>
+                <div class="video-meta">
+                    <span id="videoDuration"></span>
+                    <span id="videoCategory"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Management Modal -->
+<div class="modal" id="adminModal">
+    <div class="modal-backdrop"></div>
+    <div class="admin-modal-content">
+        <div class="modal-header">
+            <h2>
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>
+                Manage Training Videos
+            </h2>
+            <button class="modal-close-btn" id="closeAdminModal">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" data-tab="add-video">Add Video</button>
+            <button class="admin-tab" data-tab="manage-videos">Manage Videos</button>
+            <button class="admin-tab" data-tab="categories">Categories</button>
+        </div>
+
+        <!-- Tab Content: Add Video -->
+        <div class="admin-tab-content active" id="add-video">
+            <form id="addVideoForm">
+                <div class="form-group">
+                    <label>Video Title *</label>
+                    <input type="text" id="videoTitleInput" placeholder="e.g., Antenna Installation - Complete Guide" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="videoDescInput" rows="3" placeholder="Brief description of the video content" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="videoCategoryInput" required>
+                            <option value="">Select category...</option>
+                            <option value="antenna">Antenna Installation</option>
+                            <option value="waveguide">Waveguide</option>
+                            <option value="radio">Radio Equipment</option>
+                            <option value="fiber">Fiber/Coax</option>
+                            <option value="safety">Safety Procedures</option>
+                            <option value="troubleshooting">Troubleshooting</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Duration *</label>
+                        <input type="text" id="videoDurationInput" placeholder="e.g., 12:45" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>YouTube/Vimeo URL *</label>
+                    <input type="url" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=..." required>
+                    <small>Enter the full URL - we'll convert it to embed format</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Thumbnail URL (optional)</label>
+                    <input type="url" id="videoThumbnailInput" placeholder="https://...">
+                    <small>Leave blank to auto-generate from YouTube</small>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Add Video
+                </button>
+            </form>
+        </div>
+
+        <!-- Tab Content: Manage Videos -->
+        <div class="admin-tab-content" id="manage-videos">
+            <div class="video-list-header">
+                <input type="text" id="adminSearchVideos" placeholder="Search videos...">
+                <select id="adminFilterCategory">
+                    <option value="all">All Categories</option>
+                    <option value="antenna">Antenna Installation</option>
+                    <option value="waveguide">Waveguide</option>
+                    <option value="radio">Radio Equipment</option>
+                    <option value="fiber">Fiber/Coax</option>
+                    <option value="safety">Safety Procedures</option>
+                    <option value="troubleshooting">Troubleshooting</option>
+                </select>
+            </div>
+
+            <div class="admin-video-list" id="adminVideoList">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Tab Content: Categories -->
+        <div class="admin-tab-content" id="categories">
+            <div class="category-management">
+                <h3>Add New Category</h3>
+                <form id="addCategoryForm">
+                    <div class="form-row">
+                        <input type="text" id="categoryNameInput" placeholder="Category Name" required>
+                        <input type="text" id="categorySlugInput" placeholder="category-slug" required>
+                        <button type="submit" class="btn-primary">Add Category</button>
+                    </div>
+                </form>
+
+                <h3 style="margin-top: 2rem;">Existing Categories</h3>
+                <div class="category-list" id="categoryList">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Scripts -->
+    <script src="JS/tech-portal.js"></script>
+    <script src="JS/tech-portal-access.js"></script>
+    <script>
+  // Show admin link only for admin users
+  if (localStorage.getItem('userRole') === 'admin') {
+    const adminLink = document.getElementById('adminLink');
+    if (adminLink) {
+      adminLink.style.display = 'flex';
+    }
+  }
+</script>
+</body>
+</html>

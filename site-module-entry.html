@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/auth.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Module Entry - Braxon Industries</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <!-- Logo -->
+            <div class="sidebar-logo">
+                <img src="assets/logo.svg" alt="Braxon Industries Logo" class="braxon-logo-sidebar">
+            </div>
+
+            <!-- Navigation -->
+            <nav class="sidebar-nav">
+                <a href="dashboard" class="nav-item">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="projects" class="nav-item active">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span>Projects</span>
+                </a>
+
+                <a href="tech-portal" class="nav-item" id="techPortalNavLink">
+    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+    </svg>
+    <span>Tech Portal</span>
+    <svg class="lock-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display: none; margin-left: auto;">
+        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+    </svg>
+</a>
+
+<a href="/admin-console" class="nav-item" id="adminLink" style="display: none;">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Admin Console</span>
+    </a>
+        </nav>
+    </div>
+            </nav>
+
+            <!-- User Profile & Sign Out -->
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-name">Blake Miracle</div>
+                    <div class="user-email">bmiracle6585@gmail.com</div>
+                    <div class="user-role">Admin</div>
+                </div>
+                <button class="btn-signout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <!-- Back Button -->
+            <div class="back-navigation">
+                <a href="#" class="back-link" id="backToProjectBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    Back to Project
+                </a>
+            </div>
+
+            <!-- Page Header -->
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title">Site Module Entry</h1>
+                    <p class="page-subtitle">VZW- Northern Curve to Sun City</p>
+                </div>
+                <button class="btn-primary" id="saveModulesBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Module Configuration
+                </button>
+            </header>
+
+            <!-- Site Module Selection Grid -->
+            <div class="site-modules-grid">
+                <!-- Site A Module Selection -->
+                <div class="site-module-card">
+                    <div class="site-module-header">
+                        <div class="site-indicator-large site-a"></div>
+                        <div class="site-module-info">
+                            <h2 class="site-module-title">Site A</h2>
+                            <p class="site-module-name">Northern Curve</p>
+                        </div>
+                        <button class="btn-edit-modules" data-site="a">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Module
+                        </button>
+                    </div>
+                    <div class="module-count" id="siteACount">
+                        <span class="count-number">0</span>
+                        <span class="count-label">modules configured</span>
+                    </div>
+                </div>
+
+                <!-- Site B Module Selection -->
+                <div class="site-module-card">
+                    <div class="site-module-header">
+                        <div class="site-indicator-large site-b"></div>
+                        <div class="site-module-info">
+                            <h2 class="site-module-title">Site B</h2>
+                            <p class="site-module-name">Sun City</p>
+                        </div>
+                        <button class="btn-edit-modules" data-site="b">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Module
+                        </button>
+                    </div>
+                    <div class="module-count" id="siteBCount">
+                        <span class="count-number">0</span>
+                        <span class="count-label">modules configured</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configured Modules Section -->
+            <div class="section-card">
+                <h2 class="section-title">Configured Photo Modules</h2>
+                <p class="section-subtitle">Selected photo documentation requirements for each site</p>
+
+                <div class="configured-modules-grid">
+                    <!-- Site A Configured Modules -->
+                    <div class="configured-site-section">
+                        <div class="configured-site-header">
+                            <div class="site-indicator-small site-a"></div>
+                            <h3 class="configured-site-title">Site A - Northern Curve</h3>
+                        </div>
+                        <div class="configured-modules-list" id="siteAModules">
+                            <div class="empty-state-small">
+                                <p>No modules configured yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Site B Configured Modules -->
+                    <div class="configured-site-section">
+                        <div class="configured-site-header">
+                            <div class="site-indicator-small site-b"></div>
+                            <h3 class="configured-site-title">Site B - Sun City</h3>
+                        </div>
+                        <div class="configured-modules-list" id="siteBModules">
+                            <div class="empty-state-small">
+                                <p>No modules configured yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Module Selection Modal -->
+    <div class="modal-overlay" id="moduleSelectionModal" style="display: none;">
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add Photo Module</h2>
+                <button class="modal-close" id="closeModuleModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">Select a photo documentation module to add to this site.</p>
+                
+                <div class="modules-selection-grid" id="modulesGrid">
+                    <!-- Antenna Installation -->
+                    <div class="module-select-card" data-module="antenna-installation" data-photo-count="18">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2 12 7 2"></path>
+                                    <path d="m7 12 5-10"></path>
+                                    <path d="m12 12 5-10"></path>
+                                    <path d="m17 12 5-10"></path>
+                                    <path d="M4.5 17H4a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-.5"></path>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Antenna Installation</h3>
+                            <p class="module-card-photos">18 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- Waveguide Installation -->
+                    <div class="module-select-card" data-module="waveguide-installation" data-photo-count="32">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                    <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                                    <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                                    <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Waveguide Installation</h3>
+                            <p class="module-card-photos">32 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- ODU Installation -->
+                    <div class="module-select-card" data-module="odu-installation" data-photo-count="9">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect width="16" height="20" x="4" y="2" rx="2" ry="2"></rect>
+                                    <path d="M9 22v-4h6v4"></path>
+                                    <path d="M8 6h.01"></path>
+                                    <path d="M16 6h.01"></path>
+                                    <path d="M12 6h.01"></path>
+                                    <path d="M12 10h.01"></path>
+                                    <path d="M12 14h.01"></path>
+                                    <path d="M16 10h.01"></path>
+                                    <path d="M16 14h.01"></path>
+                                    <path d="M8 10h.01"></path>
+                                    <path d="M8 14h.01"></path>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">ODU Installation</h3>
+                            <p class="module-card-photos">9 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- Hybrid or Coax/Fiber -->
+                    <div class="module-select-card" data-module="hybrid-coax-fiber" data-photo-count="29">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                    <polyline points="16 6 12 2 8 6"></polyline>
+                                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Hybrid or Coax/Fiber</h3>
+                            <p class="module-card-photos">29 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- Ice Shield -->
+                    <div class="module-select-card" data-module="ice-shield" data-photo-count="11">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2.5 16.88a1 1 0 0 1-.32-1.43l9-13.02a1 1 0 0 1 1.64 0l9 13.01a1 1 0 0 1-.32 1.44l-8.51 4.86a2 2 0 0 1-1.98 0Z"></path>
+                                    <path d="M12 2v20"></path>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Ice Shield</h3>
+                            <p class="module-card-photos">11 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- Radio Installation -->
+                    <div class="module-select-card" data-module="radio-installation" data-photo-count="28">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h2"></path>
+                                    <path d="M19 18h2c.6 0 1-.4 1-1V7c0-.6-.4-1-1-1h-2"></path>
+                                    <path d="M2 12h4"></path>
+                                    <path d="M18 12h4"></path>
+                                    <rect width="13" height="13" x="6" y="6" rx="2"></rect>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Radio Installation</h3>
+                            <p class="module-card-photos">28 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- Overall Photos -->
+                    <div class="module-select-card" data-module="overall-photos" data-photo-count="13">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Overall Photos (from ground)</h3>
+                            <p class="module-card-photos">13 photos required</p>
+                        </div>
+                    </div>
+
+                    <!-- Misc Photos -->
+                    <div class="module-select-card" data-module="misc-photos" data-photo-count="10">
+                        <div class="module-card-content">
+                            <div class="module-card-header">
+                                <svg class="module-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </div>
+                            <h3 class="module-card-title">Misc. Photos</h3>
+                            <p class="module-card-photos">10 photos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Label Module Modal -->
+    <div class="modal-overlay" id="labelModuleModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Label Module</h2>
+                <button class="modal-close" id="closeLabelModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description" id="labelModalDescription">Add a custom label to identify this module (e.g., "Main Antenna", "Diversity Antenna").</p>
+                
+                <div class="form-group">
+                    <label for="moduleLabel">Module Label</label>
+                    <input 
+                        type="text" 
+                        id="moduleLabel" 
+                        placeholder="Enter module label (e.g., Main Antenna)"
+                        maxlength="50"
+                    >
+                    <span class="input-hint">Leave blank for default name</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelLabelModal">Cancel</button>
+                <button class="btn-primary" id="confirmLabelModal">Add Module</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Label Modal -->
+    <div class="modal-overlay" id="editLabelModal" style="display: none;">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Module Label</h2>
+                <button class="modal-close" id="closeEditLabelModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editModuleLabel">Module Label</label>
+                    <input 
+                        type="text" 
+                        id="editModuleLabel" 
+                        placeholder="Enter module label"
+                        maxlength="50"
+                    >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelEditLabel">Cancel</button>
+                <button class="btn-primary" id="confirmEditLabel">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/site-module-entry.js"></script>
+    <script src="JS/tech-portal-access.js"></script>
+    <script>
+  // Show admin link only for admin users
+  if (localStorage.getItem('userRole') === 'admin') {
+    const adminLink = document.getElementById('adminLink');
+    if (adminLink) {
+      adminLink.style.display = 'flex';
+    }
+  }
+</script>
+<script>
+// Fix back button navigation with correct project ID
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('projectId');
+    
+    const backBtn = document.getElementById('backToProjectBtn');
+    if (backBtn && projectId) {
+        backBtn.href = `project-details.html?id=${projectId}`;
+    }
+});
+</script>
+</body>
+</html>
