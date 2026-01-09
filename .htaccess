@@ -1,0 +1,4 @@
+RewriteEngine On
+
+# Admin Console
+RewriteRule ^admin-console/?$ admin-console.html [L]
