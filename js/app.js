@@ -14,7 +14,7 @@ async function fetchWithAuth(url, options = {}) {
     }
 
     // Build full URL if relative path given
-    const fullUrl = url.startsWith('http') ? url : `http://localhost:5000${url}`;
+    const fullUrl = url.startsWith('http') ? url : url;
 
     const defaultOptions = {
         headers: {
