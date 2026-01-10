@@ -23,7 +23,7 @@ router.post('/login', async (req, res) => {
 // Normalize email to lowercase (case-insensitive login)
 const { fn, col, where } = require('sequelize');
 
-const normalizedEmail = email.toLowerCase();
+const normalizedEmail = String(email).trim().toLowerCase();
 
 const user = await User.findOne({
   where: where(fn('LOWER', col('email')), normalizedEmail)
