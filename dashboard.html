@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+  // Redirect small screens to mobile dashboard
+  (function () {
+    if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) {
+      window.location.replace("mobile-dashboard-v2.html");
+    }
+  })();
+</script>
+    <script src="js/auth.js"></script>
     <title>Dashboard - Braxon Industries</title>
     <link rel="stylesheet" href="css/styles.css">
     <!-- Leaflet.js - Interactive Maps -->
