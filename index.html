@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <script>
+    (function () {
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        window.location.replace("mobile-login.html");
+      }
+    })();
+  </script>
     <title>Braxon Industries - Login</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
