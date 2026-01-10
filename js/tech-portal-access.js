@@ -74,14 +74,24 @@ class TechPortalAccess {
 }
 
     checkPageAccess() {
-        const isTechPortalPage = window.location.pathname.includes('tech-portal.html');
-        
-        if (isTechPortalPage && !this.hasAccess()) {
-            console.log('🚫 User on Tech Portal page without access - blocking');
-            document.body.classList.add('access-restricted');
-            this.showPageAccessDenied();
-        }
-    }
+  const path = window.location.pathname;
+
+  // If something sends us to /tech-portal (no .html), fix it cleanly
+  if (path === '/tech-portal') {
+    window.location.replace('/tech-portal.html');
+    return;
+  }
+
+  // Support both /tech-portal.html and (defensively) /tech-portal
+  const isTechPortalPage = path.includes('tech-portal');
+
+  if (isTechPortalPage && !this.hasAccess()) {
+    console.log('🚫 User on Tech Portal page without access - blocking');
+    document.body.classList.add('access-restricted');
+    this.showPageAccessDenied();
+  }
+}
+
 
     showAccessDeniedModal() {
         const existingModal = document.getElementById('accessDeniedModal');
