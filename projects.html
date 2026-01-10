@@ -4,6 +4,14 @@
     <script src="js/auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script>
+  // Redirect small screens to mobile dashboard
+  (function () {
+    if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) {
+      window.location.replace("mobile-dashboard-v2.html");
+    }
+  })();
+</script>
     <title>Projects - Braxon Industries</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
