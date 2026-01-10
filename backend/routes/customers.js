@@ -30,11 +30,13 @@ router.get('/', protect, async (req, res) => {
       ]
     });
 
-    const data = await Promise.all(
-      customers.map(async (c) => {
-        const projectCount = await Project.count({
-          where: { customer_id: c.id }
-        });
+let projectCount = 0;
+try {
+  projectCount = await Project.count({ where: { customer_id: c.id } });
+} catch (e) {
+  projectCount = 0; // projects table may not exist yet
+}
+
 
         return {
           id: c.id,
