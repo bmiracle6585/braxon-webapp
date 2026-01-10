@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+  // Redirect small screens to mobile dashboard
+  (function () {
+    if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) {
+      window.location.replace("mobile-tech-portal.html");
+    }
+  })();
+</script>
+
     <title>Tech Portal - Braxon Project Management</title>
     <link rel="stylesheet" href="css/styles.css">
     
