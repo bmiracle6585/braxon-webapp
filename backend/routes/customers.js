@@ -30,13 +30,15 @@ router.get('/', protect, async (req, res) => {
       ]
     });
 
-let projectCount = 0;
-try {
-  projectCount = await Project.count({ where: { customer_id: c.id } });
-} catch (e) {
-  projectCount = 0; // projects table may not exist yet
-}
+    const data = await Promise.all(
+      customers.map(async (c) => {
+        let projectCount = 0;
 
+        try {
+          projectCount = await Project.count({ where: { customer_id: c.id } });
+        } catch (e) {
+          projectCount = 0; // projects table may not exist yet
+        }
 
         return {
           id: c.id,
@@ -92,9 +94,12 @@ router.get('/:id', protect, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
-    const projectCount = await Project.count({
-      where: { customer_id: customer.id }
-    });
+    let projectCount = 0;
+    try {
+      projectCount = await Project.count({ where: { customer_id: customer.id } });
+    } catch (e) {
+      projectCount = 0; // projects table may not exist yet
+    }
 
     res.json({
       success: true,
@@ -148,16 +153,15 @@ router.post('/', protect, async (req, res) => {
       }
     }
 
-const customer = await Customer.create({
-  name: String(name).trim(),
-  customer_name: String(name).trim(),
-  contact_name: String(contact_name).trim(),
-  contact_email: contact_email ? String(contact_email).trim() : null,
-  contact_phone: contact_phone ? String(contact_phone).trim() : null,
-  customer_pm: customer_pm ? String(customer_pm).trim() : null,
-  address: address ? String(address).trim() : null
-});
-
+    const customer = await Customer.create({
+      name: String(name).trim(),
+      customer_name: String(name).trim(),
+      contact_name: String(contact_name).trim(),
+      contact_email: contact_email ? String(contact_email).trim() : null,
+      contact_phone: contact_phone ? String(contact_phone).trim() : null,
+      customer_pm: customer_pm ? String(customer_pm).trim() : null,
+      address: address ? String(address).trim() : null
+    });
 
     res.status(201).json({
       success: true,
@@ -209,11 +213,24 @@ router.put('/:id', protect, async (req, res) => {
 
     await customer.update({
       name: name !== undefined ? String(name).trim() : customer.name,
+      customer_name: name !== undefined ? String(name).trim() : customer.customer_name,
       contact_name: contact_name !== undefined ? String(contact_name).trim() : customer.contact_name,
-      contact_email: contact_email !== undefined ? (contact_email ? String(contact_email).trim() : null) : customer.contact_email,
-      contact_phone: contact_phone !== undefined ? (contact_phone ? String(contact_phone).trim() : null) : customer.contact_phone,
-      customer_pm: customer_pm !== undefined ? (customer_pm ? String(customer_pm).trim() : null) : customer.customer_pm,
-      address: address !== undefined ? (address ? String(address).trim() : null) : customer.address
+      contact_email:
+        contact_email !== undefined
+          ? (contact_email ? String(contact_email).trim() : null)
+          : customer.contact_email,
+      contact_phone:
+        contact_phone !== undefined
+          ? (contact_phone ? String(contact_phone).trim() : null)
+          : customer.contact_phone,
+      customer_pm:
+        customer_pm !== undefined
+          ? (customer_pm ? String(customer_pm).trim() : null)
+          : customer.customer_pm,
+      address:
+        address !== undefined
+          ? (address ? String(address).trim() : null)
+          : customer.address
     });
 
     res.json({ success: true, message: 'Contact updated', data: customer });
@@ -239,9 +256,12 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
-    const projectCount = await Project.count({
-      where: { customer_id: customer.id }
-    });
+    let projectCount = 0;
+    try {
+      projectCount = await Project.count({ where: { customer_id: customer.id } });
+    } catch (e) {
+      projectCount = 0; // projects table may not exist yet
+    }
 
     if (projectCount > 0) {
       return res.status(400).json({
