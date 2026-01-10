@@ -1,7 +1,11 @@
 // backend/config/database.js - Database Connection with Sequelize
 
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+require('dotenv').config({
+  path: '/opt/bitnami/apache/htdocs/backend/.env',
+  override: true
+});
+
 
 // Create Sequelize instance
 const sequelize = new Sequelize(
