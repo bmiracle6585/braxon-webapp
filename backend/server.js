@@ -91,6 +91,10 @@ app.get('/projects', (req, res) => {
 app.get('/tech-portal', (req, res) => {
   res.sendFile(path.join(__dirname, '../tech-portal.html'));
 });
+app.get(['/login', '/login.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '../index.html'));
+});
+
 
 // Other page routes
 const pages = [
