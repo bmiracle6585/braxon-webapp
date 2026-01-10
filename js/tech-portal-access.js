@@ -36,6 +36,15 @@ class TechPortalAccess {
         console.warn('Tech Portal nav link not found');
         return;
     }
+        // Force correct Tech Portal URL (Apache static expects .html)
+techPortalLink.setAttribute('href', 'tech-portal.html');
+
+        techPortalLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  window.location.href = 'tech-portal.html';
+});
+
+
 
     const hasAccess = this.hasAccess();
     console.log('Checking admin access. Current role:', this.getUserRole());
