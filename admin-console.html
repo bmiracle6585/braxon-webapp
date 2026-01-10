@@ -972,6 +972,13 @@
             companyName = document.getElementById('customCompanyName').value;
         }
 
+        companyName = companyName?.trim();
+       if (!companyName) {
+          alert("Company name required");
+          return;
+    }
+
+
         const customerData = {
             company_name: companyName,
             contact_name: document.getElementById('contactName').value,
