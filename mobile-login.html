@@ -196,81 +196,52 @@
         </div>
     </div>
 
-    <script>
-        const API_BASE = 'http://localhost:5000';
-        
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const loginButton = document.getElementById('loginButton');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // Hide error
-            errorMessage.classList.remove('show');
-            
-            // Disable button
-            loginButton.disabled = true;
-            loginButton.innerHTML = '<span class="loading-spinner"></span> Signing in...';
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    // Store auth data
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.user.id);
-                    localStorage.setItem('userName', data.user.name);
-                    localStorage.setItem('userEmail', data.user.email);
-                    localStorage.setItem('userRole', data.user.role);
-                    
-                    console.log('✅ Login successful:', data.user);
-                    
-                    // Success haptic feedback
-                    if (navigator.vibrate) {
-                        navigator.vibrate([50, 100, 50]);
-                    }
-                    
-                    // Redirect to mobile home
-                    window.location.href = 'mobile-home.html';
-                    
-                } else {
-                    throw new Error(data.message || 'Login failed');
-                }
-                
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                
-                errorMessage.textContent = error.message || 'Login failed. Please try again.';
-                errorMessage.classList.add('show');
-                
-                // Error haptic feedback
-                if (navigator.vibrate) {
-                    navigator.vibrate(200);
-                }
-                
-                // Re-enable button
-                loginButton.disabled = false;
-                loginButton.textContent = 'Sign In';
-            }
-        });
-        
-        // Auto-fill for testing (REMOVE IN PRODUCTION!)
-        if (window.location.hostname === 'localhost') {
-            document.getElementById('email').value = 'blake@braxon.net';
-            document.getElementById('password').value = 'password123'; // Use your actual test password
-        }
-    </script>
-    $swRegistration = @'
+  <script>
+  // Use same-origin so it works on app.braxon.net and localhost without edits
+  const API_BASE = '';
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const loginButton = document.getElementById('loginButton');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Hide error
+    errorMessage.classList.remove('show');
+
+    // Disable button
+    loginButton.disabled = true;
+    loginButton.innerHTML = '<span class="loading-spinner"></span> Signing in...';
+
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Go to dashboard route (server.js already serves /dashboard)
+      window.location.href = '/dashboard';
+    } catch (err) {
+      errorMessage.textContent = err.message || 'Invalid email or password';
+      errorMessage.classList.add('show');
+      loginButton.disabled = false;
+      loginButton.innerHTML = 'Sign In';
+    }
+  });
+</script>
+
 <script>
 // Register service worker
 if ('serviceWorker' in navigator) {
