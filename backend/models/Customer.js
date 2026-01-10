@@ -8,11 +8,16 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true
     },
-    name: {
+name: {
   type: DataTypes.STRING(100),
-  allowNull: false,
-  field: 'customer_name'  // Maps to database column
+  allowNull: false
 },
+
+customer_name: {
+  type: DataTypes.STRING(100),
+  allowNull: false
+},
+
     contact_name: {
       type: DataTypes.STRING(100),
       allowNull: true
