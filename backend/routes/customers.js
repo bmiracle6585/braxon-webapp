@@ -7,10 +7,8 @@ const { Op } = require('sequelize');
 
 /*
 |--------------------------------------------------------------------------
-| GET ALL CUSTOMERS (CONTACT ROWS)
+| GET ALL CUSTOMERS
 |--------------------------------------------------------------------------
-| Returns contact rows (one per contact) with a computed project_count.
-| Uses Sequelize model attribute names (e.g., `name`) and orders by name/contact.
 */
 router.get('/', protect, async (req, res) => {
   try {
@@ -35,9 +33,11 @@ router.get('/', protect, async (req, res) => {
         let projectCount = 0;
 
         try {
-          projectCount = await Project.count({ where: { customer_id: c.id } });
-        } catch (e) {
-          projectCount = 0; // projects table may not exist yet
+          projectCount = await Project.count({
+            where: { customer_id: c.id }
+          });
+        } catch (_) {
+          projectCount = 0;
         }
 
         return {
@@ -62,63 +62,7 @@ router.get('/', protect, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| GET CONTACTS BY COMPANY
-|--------------------------------------------------------------------------
-| IMPORTANT: this MUST be above `/:id` or it will never be reached.
-|--------------------------------------------------------------------------
-*/
-router.get('/company/:companyName/contacts', protect, async (req, res) => {
-  try {
-    const contacts = await Customer.findAll({
-      where: { name: req.params.companyName },
-      order: [['contact_name', 'ASC']]
-    });
-
-    res.json({ success: true, count: contacts.length, data: contacts });
-  } catch (error) {
-    console.error('Get company contacts error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching contacts' });
-  }
-});
-
-/*
-|--------------------------------------------------------------------------
-| GET SINGLE CONTACT
-|--------------------------------------------------------------------------
-*/
-router.get('/:id', protect, async (req, res) => {
-  try {
-    const customer = await Customer.findByPk(req.params.id);
-
-    if (!customer) {
-      return res.status(404).json({ success: false, message: 'Customer not found' });
-    }
-
-    let projectCount = 0;
-    try {
-      projectCount = await Project.count({ where: { customer_id: customer.id } });
-    } catch (e) {
-      projectCount = 0; // projects table may not exist yet
-    }
-
-    res.json({
-      success: true,
-      data: {
-        ...customer.toJSON(),
-        project_count: projectCount
-      }
-    });
-  } catch (error) {
-    console.error('Get customer error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching customer' });
-  }
-});
-
-/*
-|--------------------------------------------------------------------------
-| CREATE NEW CONTACT
-|--------------------------------------------------------------------------
-| Expects `name` in req.body (frontend should send { name: "Verizon", ... }).
+| CREATE CUSTOMER / CONTACT
 |--------------------------------------------------------------------------
 */
 router.post('/', protect, async (req, res) => {
@@ -129,45 +73,25 @@ router.post('/', protect, async (req, res) => {
 
     const { name, contact_name, contact_email, contact_phone, customer_pm, address } = req.body || {};
 
-    if (!name || !String(name).trim()) {
+    if (!name?.trim()) {
       return res.status(400).json({ success: false, message: 'Company name required' });
     }
 
-    if (!contact_name || !String(contact_name).trim()) {
+    if (!contact_name?.trim()) {
       return res.status(400).json({ success: false, message: 'Contact name required' });
     }
 
-    if (contact_email) {
-      const exists = await Customer.findOne({
-        where: {
-          name: String(name).trim(),
-          contact_email: String(contact_email).trim()
-        }
-      });
-
-      if (exists) {
-        return res.status(400).json({
-          success: false,
-          message: `Contact email already exists for ${String(name).trim()}`
-        });
-      }
-    }
-
     const customer = await Customer.create({
-      name: String(name).trim(),
-      customer_name: String(name).trim(),
-      contact_name: String(contact_name).trim(),
-      contact_email: contact_email ? String(contact_email).trim() : null,
-      contact_phone: contact_phone ? String(contact_phone).trim() : null,
-      customer_pm: customer_pm ? String(customer_pm).trim() : null,
-      address: address ? String(address).trim() : null
+      name: name.trim(),
+      customer_name: name.trim(),
+      contact_name: contact_name.trim(),
+      contact_email: contact_email?.trim() || null,
+      contact_phone: contact_phone?.trim() || null,
+      customer_pm: customer_pm?.trim() || null,
+      address: address?.trim() || null
     });
 
-    res.status(201).json({
-      success: true,
-      message: 'Contact created',
-      data: customer
-    });
+    res.status(201).json({ success: true, data: customer });
   } catch (error) {
     console.error('Create customer error:', error);
     res.status(500).json({ success: false, message: 'Error creating contact' });
@@ -176,64 +100,29 @@ router.post('/', protect, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| UPDATE CONTACT
-|--------------------------------------------------------------------------
-| Accepts optional `name` update (company name) and contact fields.
+| UPDATE CUSTOMER
 |--------------------------------------------------------------------------
 */
 router.put('/:id', protect, async (req, res) => {
   try {
-    if (!['admin', 'pm'].includes(req.user.role)) {
-      return res.status(403).json({ success: false, message: 'Not authorized' });
-    }
-
     const customer = await Customer.findByPk(req.params.id);
     if (!customer) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
-    const { name, contact_name, contact_email, contact_phone, customer_pm, address } = req.body || {};
-
-    if (contact_email && contact_email !== customer.contact_email) {
-      const exists = await Customer.findOne({
-        where: {
-          name: (name ?? customer.name),
-          contact_email,
-          id: { [Op.ne]: customer.id }
-        }
-      });
-
-      if (exists) {
-        return res.status(400).json({
-          success: false,
-          message: 'Duplicate contact email for this company'
-        });
+    const updates = {};
+    ['name', 'contact_name', 'contact_email', 'contact_phone', 'customer_pm', 'address'].forEach((k) => {
+      if (req.body[k] !== undefined) {
+        updates[k] = req.body[k]?.trim() || null;
       }
-    }
-
-    await customer.update({
-      name: name !== undefined ? String(name).trim() : customer.name,
-      customer_name: name !== undefined ? String(name).trim() : customer.customer_name,
-      contact_name: contact_name !== undefined ? String(contact_name).trim() : customer.contact_name,
-      contact_email:
-        contact_email !== undefined
-          ? (contact_email ? String(contact_email).trim() : null)
-          : customer.contact_email,
-      contact_phone:
-        contact_phone !== undefined
-          ? (contact_phone ? String(contact_phone).trim() : null)
-          : customer.contact_phone,
-      customer_pm:
-        customer_pm !== undefined
-          ? (customer_pm ? String(customer_pm).trim() : null)
-          : customer.customer_pm,
-      address:
-        address !== undefined
-          ? (address ? String(address).trim() : null)
-          : customer.address
     });
 
-    res.json({ success: true, message: 'Contact updated', data: customer });
+    if (updates.name) {
+      updates.customer_name = updates.name;
+    }
+
+    await customer.update(updates);
+    res.json({ success: true, data: customer });
   } catch (error) {
     console.error('Update customer error:', error);
     res.status(500).json({ success: false, message: 'Error updating contact' });
@@ -242,40 +131,18 @@ router.put('/:id', protect, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| DELETE CONTACT
+| DELETE CUSTOMER
 |--------------------------------------------------------------------------
 */
 router.delete('/:id', protect, async (req, res) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Not authorized' });
-    }
-
     const customer = await Customer.findByPk(req.params.id);
     if (!customer) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
-    let projectCount = 0;
-    try {
-      projectCount = await Project.count({ where: { customer_id: customer.id } });
-    } catch (e) {
-      projectCount = 0; // projects table may not exist yet
-    }
-
-    if (projectCount > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot delete contact with active projects'
-      });
-    }
-
     await customer.destroy();
-
-    res.json({
-      success: true,
-      message: `Contact ${customer.contact_name} deleted`
-    });
+    res.json({ success: true });
   } catch (error) {
     console.error('Delete customer error:', error);
     res.status(500).json({ success: false, message: 'Error deleting contact' });
