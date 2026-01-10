@@ -58,6 +58,27 @@ router.get('/', protect, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
+| GET CONTACTS BY COMPANY
+|--------------------------------------------------------------------------
+| IMPORTANT: this MUST be above `/:id` or it will never be reached.
+|--------------------------------------------------------------------------
+*/
+router.get('/company/:companyName/contacts', protect, async (req, res) => {
+  try {
+    const contacts = await Customer.findAll({
+      where: { name: req.params.companyName },
+      order: [['contact_name', 'ASC']]
+    });
+
+    res.json({ success: true, count: contacts.length, data: contacts });
+  } catch (error) {
+    console.error('Get company contacts error:', error);
+    res.status(500).json({ success: false, message: 'Error fetching contacts' });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
 | GET SINGLE CONTACT
 |--------------------------------------------------------------------------
 */
@@ -88,27 +109,6 @@ router.get('/:id', protect, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| GET CONTACTS BY COMPANY
-|--------------------------------------------------------------------------
-| IMPORTANT: Model attribute is `name` (maps to DB column customer_name via `field`).
-|--------------------------------------------------------------------------
-*/
-router.get('/company/:companyName/contacts', protect, async (req, res) => {
-  try {
-    const contacts = await Customer.findAll({
-      where: { name: req.params.companyName },
-      order: [['contact_name', 'ASC']]
-    });
-
-    res.json({ success: true, count: contacts.length, data: contacts });
-  } catch (error) {
-    console.error('Get company contacts error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching contacts' });
-  }
-});
-
-/*
-|--------------------------------------------------------------------------
 | CREATE NEW CONTACT
 |--------------------------------------------------------------------------
 | Expects `name` in req.body (frontend should send { name: "Verizon", ... }).
@@ -120,46 +120,39 @@ router.post('/', protect, async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 
-    const {
-      name,
-      contact_name,
-      contact_email,
-      contact_phone,
-      customer_pm,
-      address
-    } = req.body;
+    const { name, contact_name, contact_email, contact_phone, customer_pm, address } = req.body || {};
 
-    if (!name?.trim()) {
+    if (!name || !String(name).trim()) {
       return res.status(400).json({ success: false, message: 'Company name required' });
     }
 
-    if (!contact_name?.trim()) {
+    if (!contact_name || !String(contact_name).trim()) {
       return res.status(400).json({ success: false, message: 'Contact name required' });
     }
 
     if (contact_email) {
       const exists = await Customer.findOne({
         where: {
-          name: name.trim(),
-          contact_email: contact_email.trim()
+          name: String(name).trim(),
+          contact_email: String(contact_email).trim()
         }
       });
 
       if (exists) {
         return res.status(400).json({
           success: false,
-          message: `Contact email already exists for ${name.trim()}`
+          message: `Contact email already exists for ${String(name).trim()}`
         });
       }
     }
 
     const customer = await Customer.create({
-      name: name.trim(),
-      contact_name: contact_name.trim(),
-      contact_email: contact_email?.trim() || null,
-      contact_phone: contact_phone?.trim() || null,
-      customer_pm: customer_pm?.trim() || null,
-      address: address?.trim() || null
+      name: String(name).trim(),
+      contact_name: String(contact_name).trim(),
+      contact_email: contact_email ? String(contact_email).trim() : null,
+      contact_phone: contact_phone ? String(contact_phone).trim() : null,
+      customer_pm: customer_pm ? String(customer_pm).trim() : null,
+      address: address ? String(address).trim() : null
     });
 
     res.status(201).json({
@@ -191,14 +184,7 @@ router.put('/:id', protect, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
-    const {
-      name,
-      contact_name,
-      contact_email,
-      contact_phone,
-      customer_pm,
-      address
-    } = req.body;
+    const { name, contact_name, contact_email, contact_phone, customer_pm, address } = req.body || {};
 
     if (contact_email && contact_email !== customer.contact_email) {
       const exists = await Customer.findOne({
@@ -218,12 +204,12 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     await customer.update({
-      name: name?.trim() ?? customer.name,
-      contact_name: contact_name?.trim() ?? customer.contact_name,
-      contact_email: contact_email !== undefined ? contact_email?.trim() : customer.contact_email,
-      contact_phone: contact_phone !== undefined ? contact_phone?.trim() : customer.contact_phone,
-      customer_pm: customer_pm !== undefined ? customer_pm?.trim() : customer.customer_pm,
-      address: address !== undefined ? address?.trim() : customer.address
+      name: name !== undefined ? String(name).trim() : customer.name,
+      contact_name: contact_name !== undefined ? String(contact_name).trim() : customer.contact_name,
+      contact_email: contact_email !== undefined ? (contact_email ? String(contact_email).trim() : null) : customer.contact_email,
+      contact_phone: contact_phone !== undefined ? (contact_phone ? String(contact_phone).trim() : null) : customer.contact_phone,
+      customer_pm: customer_pm !== undefined ? (customer_pm ? String(customer_pm).trim() : null) : customer.customer_pm,
+      address: address !== undefined ? (address ? String(address).trim() : null) : customer.address
     });
 
     res.json({ success: true, message: 'Contact updated', data: customer });
