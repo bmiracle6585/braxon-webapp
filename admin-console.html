@@ -966,17 +966,21 @@
         event.preventDefault();
         
         const customerId = document.getElementById('customerId').value;
-        
-        let companyName = document.getElementById('customerName').value;
-        if (companyName === 'other') {
-            companyName = document.getElementById('customCompanyName').value;
-        }
+        const companySelect = document.getElementById('customerName');
+        const customCompanyInput = document.getElementById('customCompanyName');
 
-        companyName = companyName?.trim();
-       if (!companyName) {
-          alert("Company name required");
+        let companyName =
+          companySelect.value === 'other'
+            ? customCompanyInput.value
+            : companySelect.value;
+
+        companyName = (companyName || '').trim();
+
+        if (!companyName) {
+          alert('Company name required');
           return;
     }
+
 
 
         const customerData = {
