@@ -20,8 +20,11 @@ router.post('/login', async (req, res) => {
             });
         }
 
+        // Normalize email to lowercase (case-insensitive login)
+        const normalizedEmail = email.toLowerCase();
+
         // Find user by email
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email: normalizedEmail } });
 
         if (!user) {
             return res.status(401).json({
