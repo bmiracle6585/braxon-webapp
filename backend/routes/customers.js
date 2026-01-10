@@ -1,3 +1,4 @@
+// backend/routes/customers.js
 const express = require('express');
 const router = express.Router();
 const { Customer, Project } = require('../models');
@@ -8,13 +9,15 @@ const { Op } = require('sequelize');
 |--------------------------------------------------------------------------
 | GET ALL CUSTOMERS (CONTACT ROWS)
 |--------------------------------------------------------------------------
+| Returns contact rows (one per contact) with a computed project_count.
+| Uses Sequelize model attribute names (e.g., `name`) and orders by name/contact.
 */
 router.get('/', protect, async (req, res) => {
   try {
     const customers = await Customer.findAll({
       attributes: [
         'id',
-        'customer_name',
+        'name',
         'contact_name',
         'contact_email',
         'contact_phone',
@@ -22,7 +25,7 @@ router.get('/', protect, async (req, res) => {
         'address'
       ],
       order: [
-        ['customer_name', 'ASC'],
+        ['name', 'ASC'],
         ['contact_name', 'ASC']
       ]
     });
@@ -35,7 +38,7 @@ router.get('/', protect, async (req, res) => {
 
         return {
           id: c.id,
-          customer_name: c.customer_name,
+          name: c.name,
           contact_name: c.contact_name,
           contact_email: c.contact_email,
           contact_phone: c.contact_phone,
@@ -87,11 +90,13 @@ router.get('/:id', protect, async (req, res) => {
 |--------------------------------------------------------------------------
 | GET CONTACTS BY COMPANY
 |--------------------------------------------------------------------------
+| IMPORTANT: Model attribute is `name` (maps to DB column customer_name via `field`).
+|--------------------------------------------------------------------------
 */
 router.get('/company/:companyName/contacts', protect, async (req, res) => {
   try {
     const contacts = await Customer.findAll({
-      where: { customer_name: req.params.companyName },
+      where: { name: req.params.companyName },
       order: [['contact_name', 'ASC']]
     });
 
@@ -106,6 +111,8 @@ router.get('/company/:companyName/contacts', protect, async (req, res) => {
 |--------------------------------------------------------------------------
 | CREATE NEW CONTACT
 |--------------------------------------------------------------------------
+| Expects `name` in req.body (frontend should send { name: "Verizon", ... }).
+|--------------------------------------------------------------------------
 */
 router.post('/', protect, async (req, res) => {
   try {
@@ -114,7 +121,7 @@ router.post('/', protect, async (req, res) => {
     }
 
     const {
-      customer_name,
+      name,
       contact_name,
       contact_email,
       contact_phone,
@@ -122,7 +129,7 @@ router.post('/', protect, async (req, res) => {
       address
     } = req.body;
 
-    if (!customer_name?.trim()) {
+    if (!name?.trim()) {
       return res.status(400).json({ success: false, message: 'Company name required' });
     }
 
@@ -133,7 +140,7 @@ router.post('/', protect, async (req, res) => {
     if (contact_email) {
       const exists = await Customer.findOne({
         where: {
-          customer_name: customer_name.trim(),
+          name: name.trim(),
           contact_email: contact_email.trim()
         }
       });
@@ -141,13 +148,13 @@ router.post('/', protect, async (req, res) => {
       if (exists) {
         return res.status(400).json({
           success: false,
-          message: `Contact email already exists for ${customer_name}`
+          message: `Contact email already exists for ${name.trim()}`
         });
       }
     }
 
     const customer = await Customer.create({
-      customer_name: customer_name.trim(),
+      name: name.trim(),
       contact_name: contact_name.trim(),
       contact_email: contact_email?.trim() || null,
       contact_phone: contact_phone?.trim() || null,
@@ -170,6 +177,8 @@ router.post('/', protect, async (req, res) => {
 |--------------------------------------------------------------------------
 | UPDATE CONTACT
 |--------------------------------------------------------------------------
+| Accepts optional `name` update (company name) and contact fields.
+|--------------------------------------------------------------------------
 */
 router.put('/:id', protect, async (req, res) => {
   try {
@@ -183,7 +192,7 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     const {
-      customer_name,
+      name,
       contact_name,
       contact_email,
       contact_phone,
@@ -194,7 +203,7 @@ router.put('/:id', protect, async (req, res) => {
     if (contact_email && contact_email !== customer.contact_email) {
       const exists = await Customer.findOne({
         where: {
-          customer_name: customer_name || customer.customer_name,
+          name: (name ?? customer.name),
           contact_email,
           id: { [Op.ne]: customer.id }
         }
@@ -209,7 +218,7 @@ router.put('/:id', protect, async (req, res) => {
     }
 
     await customer.update({
-      customer_name: customer_name?.trim() ?? customer.customer_name,
+      name: name?.trim() ?? customer.name,
       contact_name: contact_name?.trim() ?? customer.contact_name,
       contact_email: contact_email !== undefined ? contact_email?.trim() : customer.contact_email,
       contact_phone: contact_phone !== undefined ? contact_phone?.trim() : customer.contact_phone,
