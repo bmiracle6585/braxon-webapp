@@ -73,8 +73,16 @@ app.use('/uploads/receipts', express.static(path.join(__dirname, '../uploads/rec
 
 // HTML Routes
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
+  const ua = req.headers['user-agent'] || '';
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+
+  if (isMobile) {
+    return res.sendFile(path.join(__dirname, '../mobile-login.html'));
+  }
+
+  return res.sendFile(path.join(__dirname, '../index.html'));
 });
+
 
 app.get('/admin-console', (req, res) => {
   res.sendFile(path.join(__dirname, '../admin-console.html'));
@@ -92,8 +100,16 @@ app.get('/tech-portal', (req, res) => {
   res.sendFile(path.join(__dirname, '../tech-portal.html'));
 });
 app.get(['/login', '/login.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
+  const ua = req.headers['user-agent'] || '';
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+
+  if (isMobile) {
+    return res.sendFile(path.join(__dirname, '../mobile-login.html'));
+  }
+
+  return res.sendFile(path.join(__dirname, '../index.html'));
 });
+
 
 
 // Other page routes
