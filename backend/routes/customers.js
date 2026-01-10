@@ -146,14 +146,16 @@ router.post('/', protect, async (req, res) => {
       }
     }
 
-    const customer = await Customer.create({
-      name: String(name).trim(),
-      contact_name: String(contact_name).trim(),
-      contact_email: contact_email ? String(contact_email).trim() : null,
-      contact_phone: contact_phone ? String(contact_phone).trim() : null,
-      customer_pm: customer_pm ? String(customer_pm).trim() : null,
-      address: address ? String(address).trim() : null
-    });
+const customer = await Customer.create({
+  name: String(name).trim(),
+  customer_name: String(name).trim(),
+  contact_name: String(contact_name).trim(),
+  contact_email: contact_email ? String(contact_email).trim() : null,
+  contact_phone: contact_phone ? String(contact_phone).trim() : null,
+  customer_pm: customer_pm ? String(customer_pm).trim() : null,
+  address: address ? String(address).trim() : null
+});
+
 
     res.status(201).json({
       success: true,
