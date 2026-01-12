@@ -750,12 +750,17 @@
             });
         }
 
-        // User Initialization
-        function initializeUser() {
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            const userName = userData.full_name || userData.username || 'User';
-            document.getElementById('userName').textContent = userName;
-        }
+       // User Initialization
+function initializeUser() {
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    const userName =
+        userData.full_name ||
+        `${userData.first_name || ''} ${userData.last_name || ''}`.trim() ||
+        userData.username ||
+        'User';
+    document.getElementById('userName').textContent = userName;
+}
+
 
         function setupEventListeners() {
             const categoryDropdown = document.getElementById('categoryDropdown');
