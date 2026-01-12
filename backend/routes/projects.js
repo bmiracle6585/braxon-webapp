@@ -47,7 +47,7 @@ router.get('/', protect, async (req, res) => {
     include: [
       {
         model: Customer,
-        as: 'Customer',
+        as: 'customer',
         attributes: ['id', 'customer_name', 'contact_name', 'contact_email', 'contact_phone']
       }
     ],
@@ -78,7 +78,7 @@ router.get('/:id', protect, async (req, res) => {
       include: [
         {
           model: Customer,
-          as: 'Customer',
+          as: 'customer',
           attributes: ['id', 'customer_name', 'contact_name', 'contact_email', 'contact_phone']
         }
       ]
@@ -403,7 +403,7 @@ router.post('/', protect, async (req, res) => {
       include: [
         {
   model: Customer,
-  as: 'Customer',
+  as: 'customer',
   attributes: ['id', 'name', 'contact_name']
 },
         {
