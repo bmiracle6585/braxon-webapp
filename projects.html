@@ -450,6 +450,7 @@ document.getElementById('createProjectForm').addEventListener('submit', async fu
     e.preventDefault();
     
     const formData = {
+        project_code: `BRX-${Date.now()}`,
         customer_id: document.getElementById('customerContact').value, // ✅ Changed
         project_name: document.getElementById('projectName').value,
         scope_of_work: document.getElementById('scopeOfWork').value,
