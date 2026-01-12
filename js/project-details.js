@@ -42,7 +42,7 @@ async function loadProjectData() {
         }
         
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+        const response = await fetch(`/api/projects/${projectId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -166,7 +166,7 @@ async function loadModuleData() {
         if (!projectId) return;
         
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/projects/${projectId}/modules`, {
+        const response = await fetch(`/api/projects/${projectId}/modules`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -269,10 +269,10 @@ async function updateProjectStatus(status) {
     try {
         if (statusSelect) statusSelect.disabled = true;
         
-        console.log('📡 Sending PUT request to:', `http://localhost:5000/api/projects/${projectId}`);
+        console.log('📡 Sending PUT request to:', `/api/projects/${projectId}`);
         console.log('📦 Request body:', JSON.stringify({ status: status }));
         
-        const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+        const response = await fetch(`/api/projects/${projectId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -532,7 +532,7 @@ function populateEditModal() {
 async function loadCustomersForEdit() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/customers', {
+        const response = await fetch('/api/customers', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -594,7 +594,7 @@ async function handleEditSubmit(e) {
     
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/projects/${currentProject.id}`, {
+        const response = await fetch(`/api/projects/${currentProject.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -687,7 +687,7 @@ async function deleteProject(projectId) {
         deleteBtn.disabled = true;
         deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
         
-        const response = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+        const response = await fetch(`/api/projects/${projectId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
