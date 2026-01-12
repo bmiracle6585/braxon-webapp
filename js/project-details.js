@@ -39,6 +39,34 @@ window.initEditSiteInfo = window.initEditSiteInfo || function () {};
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Page loaded');
 
+function initTeamButtons() {
+  const addBtn = document.getElementById('addTeamMemberBtn');
+  const editBtn = document.getElementById('editTeamBtn');
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      if (typeof window.openTeamModal === 'function') {
+        window.openTeamModal();
+      } else {
+        console.warn('openTeamModal is not defined');
+      }
+    });
+  }
+
+  if (editBtn) {
+    editBtn.addEventListener('click', () => {
+      if (typeof window.openEditTeamModal === 'function') {
+        window.openEditTeamModal();
+      } else {
+        console.warn('openEditTeamModal is not defined');
+      }
+    });
+  }
+}  
+
+   // 🔑 MUST COME FIRST
+  initTeamButtons();
+  
   // Ensure links that depend on projectId are set early
   setDynamicLinks();
 
