@@ -304,7 +304,7 @@ async function handleNewProjectSubmit(form) {
     
     const projectData = {
         project_code: `BRX-${Date.now()}`,
-        project_name: formData.get('projectName'),
+        name: formData.get('projectName'),
         customer_id: customer ? customer.id : null,
         status: formData.get('projectStatus'),
         start_date: formData.get('projectStartDate') || null,
