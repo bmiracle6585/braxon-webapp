@@ -403,7 +403,7 @@ router.post('/', protect, async (req, res) => {
       include: [
         {
   model: Customer,
-  as: 'customer',
+  as: 'Customer',
   attributes: ['id', 'name', 'contact_name']
 },
         {
