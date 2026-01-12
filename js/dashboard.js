@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadRecentProjects() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/projects', {
+        const response = await fetch('/api/projects', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -155,7 +155,7 @@ async function loadScheduleWidget() {
     
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/projects', {
+        const response = await fetch('/api/projects', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
