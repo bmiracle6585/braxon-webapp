@@ -19,19 +19,42 @@ window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTe
 // ------------------------------------------
 // TEAM MODAL (placeholder so button works)
 // ------------------------------------------
-window.openTeamModal = window.openTeamModal || function openTeamModal() {
-  // Non-blocking placeholder: no errors, no alerts.
-  console.log('👥 openTeamModal: placeholder (no-op)');
+// ================================
+// TEAM MODAL (TEMP / WIRED STUB)
+// ================================
+
+window.openTeamModal = function openTeamModal() {
+  console.log('👥 openTeamModal fired');
+
+  // Visual confirmation (non-blocking, removable later)
+  const msg = document.createElement('div');
+  msg.textContent = 'Team modal hook fired (UI not wired yet)';
+  msg.style.position = 'fixed';
+  msg.style.bottom = '20px';
+  msg.style.right = '20px';
+  msg.style.padding = '10px 14px';
+  msg.style.background = '#111';
+  msg.style.color = '#fff';
+  msg.style.borderRadius = '8px';
+  msg.style.fontSize = '13px';
+  msg.style.zIndex = '9999';
+  document.body.appendChild(msg);
+
+  setTimeout(() => msg.remove(), 2000);
 };
 
-window.closeTeamModal = window.closeTeamModal || function closeTeamModal() {
-  console.log('👥 closeTeamModal: placeholder (no-op)');
+window.closeTeamModal = function closeTeamModal() {
+  console.log('👥 closeTeamModal fired');
 };
 
-// If these are missing on some builds, don’t crash the page
-window.initDocumentManagement = window.initDocumentManagement || function () {};
-window.initDailyUpdates = window.initDailyUpdates || function () {};
-window.initEditSiteInfo = window.initEditSiteInfo || function () {};
+// ================================
+// SAFE NO-OP FALLBACKS (DO NOT TOUCH)
+// ================================
+
+window.initDocumentManagement ||= function () {};
+window.initDailyUpdates ||= function () {};
+window.initEditSiteInfo ||= function () {};
+
 
 // ==========================================
 // INIT
