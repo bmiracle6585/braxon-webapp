@@ -418,5 +418,20 @@ router.delete('/:reportId', protect, async (req, res) => {
     });
   }
 });
+// @route   GET /api/daily-reports/project/:projectId/concerns
+// @desc    Get concerns/issues for a project (placeholder)
+// @access  Private
+router.get('/project/:projectId/concerns', protect, async (req, res) => {
+  try {
+    return res.json({ success: true, data: [] });
+  } catch (error) {
+    console.error('Get concerns error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve concerns',
+      error: error.message
+    });
+  }
+});
 
 module.exports = router;
