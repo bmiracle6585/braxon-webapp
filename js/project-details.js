@@ -16,7 +16,17 @@ window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTe
   // Team widget will be wired later.
   return;
 });
+// ------------------------------------------
+// TEAM MODAL (placeholder so button works)
+// ------------------------------------------
+window.openTeamModal = window.openTeamModal || function openTeamModal() {
+  // Non-blocking placeholder: no errors, no alerts.
+  console.log('👥 openTeamModal: placeholder (no-op)');
+};
 
+window.closeTeamModal = window.closeTeamModal || function closeTeamModal() {
+  console.log('👥 closeTeamModal: placeholder (no-op)');
+};
 
 // If these are missing on some builds, don’t crash the page
 window.initDocumentManagement = window.initDocumentManagement || function () {};
