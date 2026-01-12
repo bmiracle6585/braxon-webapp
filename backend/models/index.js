@@ -45,11 +45,11 @@ const db = {
 // ==========================================
 
 // User <-> Customer
-User.belongsTo(Customer, { foreignKey: 'customer_id', as: 'Customer' });
+User.belongsTo(Customer, { foreignKey: 'customer_id', as: 'customer' });
 Customer.hasMany(User, { foreignKey: 'customer_id', as: 'Users' });
 
 // Project <-> Customer
-Project.belongsTo(Customer, { foreignKey: 'customer_id', as: 'Customer' });
+Project.belongsTo(Customer, { foreignKey: 'customer_id', as: 'customer' });
 Customer.hasMany(Project, { foreignKey: 'customer_id', as: 'Projects' });
 
 // DailyReport <-> Project
@@ -57,7 +57,7 @@ DailyReport.belongsTo(Project, { foreignKey: 'project_id', as: 'Project' });
 Project.hasMany(DailyReport, { foreignKey: 'project_id', as: 'DailyReports' });
 
 // DailyReport <-> User
-DailyReport.belongsTo(User, { foreignKey: 'submitted_by', as: 'SubmittedBy' });
+DailyReport.belongsTo(User, { foreignKey: 'submitted_by', as: 'submittedBy' });
 User.hasMany(DailyReport, { foreignKey: 'submitted_by', as: 'DailyReports' });
 
 // Receipt <-> Project
@@ -65,7 +65,7 @@ Receipt.belongsTo(Project, { foreignKey: 'project_id', as: 'Project' });
 Project.hasMany(Receipt, { foreignKey: 'project_id', as: 'Receipts' });
 
 // Receipt <-> User
-Receipt.belongsTo(User, { foreignKey: 'submitted_by', as: 'SubmittedBy' });
+Receipt.belongsTo(User, { foreignKey: 'submitted_by', as: 'submittedBy' });
 User.hasMany(Receipt, { foreignKey: 'submitted_by', as: 'Receipts' });
 
 // ProjectTeamMember associations
