@@ -109,6 +109,7 @@ try {
             localStorage.setItem('userLoggedIn', 'true');
             localStorage.setItem('userId', data.user.id);
             localStorage.setItem('userName', data.user.full_name);
+            localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('userEmail', data.user.email);
             localStorage.setItem('userRole', data.user.role);
             
