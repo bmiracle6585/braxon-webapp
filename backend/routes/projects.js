@@ -1,7 +1,44 @@
+// backend/routes/projects.js
 const express = require('express');
 const router = express.Router();
 const { Project, Customer, User } = require('../models');
 const protect = require('../middleware/auth');
+
+/**
+ * Convert a DMS pair string like:
+ *   "36 36 39.37, -108 39 55.32"
+ * into decimal degrees:
+ *   { lat: 36.610936..., lng: -108.665366... }
+ *
+ * NOTE: This does NOT change how you store/display site_*_location.
+ * It only auto-populates site_*_latitude/longitude when missing.
+ */
+function dmsPairToDecimal(pairStr) {
+  if (!pairStr || typeof pairStr !== 'string') return null;
+
+  const parts = pairStr.split(',').map(s => s.trim());
+  if (parts.length !== 2) return null;
+
+  function dmsToDec(dmsStr) {
+    const nums = dmsStr.split(/\s+/).filter(Boolean).map(Number);
+    if (nums.length < 3 || nums.some(n => Number.isNaN(n))) return null;
+
+    const deg = nums[0];
+    const min = nums[1];
+    const sec = nums[2];
+
+    const sign = deg < 0 ? -1 : 1;
+    const absDeg = Math.abs(deg);
+
+    return sign * (absDeg + (min / 60) + (sec / 3600));
+  }
+
+  const lat = dmsToDec(parts[0]);
+  const lng = dmsToDec(parts[1]);
+  if (lat === null || lng === null) return null;
+
+  return { lat, lng };
+}
 
 // @desc    Get all projects (filtered by user role and permissions)
 // @route   GET /api/projects
@@ -18,7 +55,7 @@ router.get('/', protect, async (req, res) => {
     if (userRole === 'admin') {
       // No filter for admins
     }
-    
+
     // ✅ CUSTOMER USERS: Only see their company's projects
     else if (userRole === 'customer') {
       if (!userCustomerId) {
@@ -31,42 +68,42 @@ router.get('/', protect, async (req, res) => {
       }
       whereClause.customer_id = userCustomerId;
     }
-    
+
     // ✅ PROJECT MANAGERS: Only see projects they manage
     else if (userRole === 'pm') {
       whereClause.project_manager_id = userId;
     }
-    
+
     // ✅ FIELD TECHS & QA: See active projects only
     else if (userRole === 'field' || userRole === 'qa') {
       whereClause.status = 'in_progress';
     }
 
     const projects = await Project.findAll({
-    where: whereClause,
-    include: [
-      {
-        model: Customer,
-        as: 'customer',
-        attributes: ['id', 'customer_name', 'contact_name', 'contact_email', 'contact_phone']
-      }
-    ],
-    order: [['created_at', 'DESC']]
-  });
-  
-  res.json({
-    success: true,
-    count: projects.length,
-    data: projects
-  });
-} catch (error) {
-  console.error('Get projects error:', error);
-  res.status(500).json({
-    success: false,
-    message: 'Error fetching projects',
-    error: error.message
-  });
-}
+      where: whereClause,
+      include: [
+        {
+          model: Customer,
+          as: 'customer',
+          attributes: ['id', 'customer_name', 'contact_name', 'contact_email', 'contact_phone']
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      count: projects.length,
+      data: projects
+    });
+  } catch (error) {
+    console.error('Get projects error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching projects',
+      error: error.message
+    });
+  }
 });
 
 // @desc    Get single project (with permission check)
@@ -144,7 +181,8 @@ router.get('/:id/modules', protect, async (req, res) => {
 
     console.log('📥 Loading modules for project:', projectId);
 
-    const [results] = await sequelize.query(`
+    const [results] = await sequelize.query(
+      `
       SELECT 
         psm.id,
         psm.site,
@@ -157,9 +195,11 @@ router.get('/:id/modules', protect, async (req, res) => {
       LEFT JOIN installation_modules im ON psm.installation_module_id = im.id
       WHERE psm.project_id = :projectId
       ORDER BY psm.site, psm.created_at
-    `, {
-      replacements: { projectId }
-    });
+    `,
+      {
+        replacements: { projectId }
+      }
+    );
 
     console.log('📊 Found modules:', results);
 
@@ -176,8 +216,8 @@ router.get('/:id/modules', protect, async (req, res) => {
         installation_module_id: row.installation_module_id,
         module_name: row.module_name,
         module_description: row.module_description,
-        total_required_photos: parseInt(row.total_required_photos) || 0,
-        uploaded_photos: parseInt(row.uploaded_photos) || 0
+        total_required_photos: parseInt(row.total_required_photos, 10) || 0,
+        uploaded_photos: parseInt(row.uploaded_photos, 10) || 0
       });
     });
 
@@ -187,7 +227,6 @@ router.get('/:id/modules', protect, async (req, res) => {
       success: true,
       data: modulesBySite
     });
-
   } catch (error) {
     console.error('❌ Get project modules error:', error);
     res.status(500).json({
@@ -231,48 +270,50 @@ router.post('/:id/modules', protect, async (req, res) => {
 
     try {
       // Delete existing modules for this project
-      await sequelize.query(
-        'DELETE FROM project_site_modules WHERE project_id = :projectId',
-        { 
-          replacements: { projectId },
-          transaction 
-        }
-      );
+      await sequelize.query('DELETE FROM project_site_modules WHERE project_id = :projectId', {
+        replacements: { projectId },
+        transaction
+      });
 
       console.log('🗑️ Deleted existing modules');
 
       // Insert each module
       for (let i = 0; i < modules.length; i++) {
         const module = modules[i];
-        
+
         console.log(`📍 Inserting module ${i + 1}:`, module);
-        
+
         // Get the required photo count for this module
         const [photoCountResult] = await sequelize.query(
-          `SELECT COUNT(*) as photo_count 
-           FROM photo_checklist_items 
-           WHERE installation_module_id = :moduleId 
-             AND is_active = true 
-             AND is_required = true`,
+          `
+          SELECT COUNT(*) as photo_count 
+          FROM photo_checklist_items 
+          WHERE installation_module_id = :moduleId 
+            AND is_active = true 
+            AND is_required = true
+        `,
           {
-            replacements: { 
-              moduleId: module.moduleId || module.installation_module_id 
+            replacements: {
+              moduleId: module.moduleId || module.installation_module_id
             },
             transaction
           }
         );
 
-        const requiredPhotoCount = parseInt(photoCountResult[0].photo_count) || 0;
-        console.log(`📸 Module ${module.moduleId} requires ${requiredPhotoCount} photos`);
+        const requiredPhotoCount = parseInt(photoCountResult[0].photo_count, 10) || 0;
+        console.log(`📸 Module ${module.moduleId || module.installation_module_id} requires ${requiredPhotoCount} photos`);
 
         // Insert the module with photo count
         await sequelize.query(
-          `INSERT INTO project_site_modules 
-           (project_id, site, installation_module_id, custom_label, status,
-            total_required_photos, total_uploaded_photos, completion_percentage,
-            started_at, created_at, updated_at)
-           VALUES (:projectId, :site, :moduleId, :customLabel, 'not_started',
-            :requiredPhotoCount, 0, 0, NOW(), NOW(), NOW())`,
+          `
+          INSERT INTO project_site_modules 
+            (project_id, site, installation_module_id, custom_label, status,
+             total_required_photos, total_uploaded_photos, completion_percentage,
+             started_at, created_at, updated_at)
+          VALUES 
+            (:projectId, :site, :moduleId, :customLabel, 'not_started',
+             :requiredPhotoCount, 0, 0, NOW(), NOW(), NOW())
+        `,
           {
             replacements: {
               projectId,
@@ -295,13 +336,11 @@ router.post('/:id/modules', protect, async (req, res) => {
         success: true,
         message: 'Module configuration saved successfully'
       });
-
     } catch (error) {
       await transaction.rollback();
       console.error('❌ Transaction rolled back:', error);
       throw error;
     }
-
   } catch (error) {
     console.error('❌ Save modules error:', error);
     res.status(500).json({
@@ -372,6 +411,27 @@ router.post('/', protect, async (req, res) => {
       });
     }
 
+    // Auto-fill numeric coords from DMS strings on CREATE as well (optional but matches widget intent)
+    const aDec = (site_a_location && (site_a_latitude === undefined || site_a_longitude === undefined))
+      ? dmsPairToDecimal(site_a_location)
+      : null;
+
+    const bDec = (site_b_location && (site_b_latitude === undefined || site_b_longitude === undefined))
+      ? dmsPairToDecimal(site_b_location)
+      : null;
+
+    const final_site_a_latitude =
+      (site_a_latitude !== undefined) ? site_a_latitude : (aDec ? aDec.lat : null);
+
+    const final_site_a_longitude =
+      (site_a_longitude !== undefined) ? site_a_longitude : (aDec ? aDec.lng : null);
+
+    const final_site_b_latitude =
+      (site_b_latitude !== undefined) ? site_b_latitude : (bDec ? bDec.lat : null);
+
+    const final_site_b_longitude =
+      (site_b_longitude !== undefined) ? site_b_longitude : (bDec ? bDec.lng : null);
+
     const project = await Project.create({
       project_code,
       project_name,
@@ -387,13 +447,13 @@ router.post('/', protect, async (req, res) => {
       site_a_name,
       site_a_address,
       site_a_location,
-      site_a_latitude,
-      site_a_longitude,
+      site_a_latitude: final_site_a_latitude,
+      site_a_longitude: final_site_a_longitude,
       site_b_name,
       site_b_address,
       site_b_location,
-      site_b_latitude,
-      site_b_longitude,
+      site_b_latitude: final_site_b_latitude,
+      site_b_longitude: final_site_b_longitude,
       scope_of_work,
       description
     });
@@ -402,10 +462,10 @@ router.post('/', protect, async (req, res) => {
     const projectWithCustomer = await Project.findByPk(project.id, {
       include: [
         {
-  model: Customer,
-  as: 'customer',
-  attributes: ['id', 'name', 'contact_name']
-},
+          model: Customer,
+          as: 'customer',
+          attributes: ['id', 'customer_name', 'contact_name', 'contact_email', 'contact_phone']
+        },
         {
           model: User,
           as: 'projectManager',
@@ -486,7 +546,7 @@ router.put('/:id', protect, async (req, res) => {
       const existingProject = await Project.findOne({
         where: { project_code }
       });
-      
+
       if (existingProject) {
         return res.status(400).json({
           success: false,
@@ -494,6 +554,27 @@ router.put('/:id', protect, async (req, res) => {
         });
       }
     }
+
+    // Auto-fill numeric coords from DMS strings ONLY when numeric coords are not provided
+    const aDec = (site_a_location && (site_a_latitude === undefined || site_a_longitude === undefined))
+      ? dmsPairToDecimal(site_a_location)
+      : null;
+
+    const bDec = (site_b_location && (site_b_latitude === undefined || site_b_longitude === undefined))
+      ? dmsPairToDecimal(site_b_location)
+      : null;
+
+    const final_site_a_latitude =
+      (site_a_latitude !== undefined) ? site_a_latitude : (aDec ? aDec.lat : undefined);
+
+    const final_site_a_longitude =
+      (site_a_longitude !== undefined) ? site_a_longitude : (aDec ? aDec.lng : undefined);
+
+    const final_site_b_latitude =
+      (site_b_latitude !== undefined) ? site_b_latitude : (bDec ? bDec.lat : undefined);
+
+    const final_site_b_longitude =
+      (site_b_longitude !== undefined) ? site_b_longitude : (bDec ? bDec.lng : undefined);
 
     await project.update({
       project_code: project_code || project.project_code,
@@ -508,12 +589,16 @@ router.put('/:id', protect, async (req, res) => {
       hours_estimate: hours_estimate !== undefined ? hours_estimate : project.hours_estimate,
       site_a_name: site_a_name !== undefined ? site_a_name : project.site_a_name,
       site_a_location: site_a_location !== undefined ? site_a_location : project.site_a_location,
-      site_a_latitude: site_a_latitude !== undefined ? site_a_latitude : project.site_a_latitude,
-      site_a_longitude: site_a_longitude !== undefined ? site_a_longitude : project.site_a_longitude,
+      site_a_latitude:
+        final_site_a_latitude !== undefined ? final_site_a_latitude : project.site_a_latitude,
+      site_a_longitude:
+        final_site_a_longitude !== undefined ? final_site_a_longitude : project.site_a_longitude,
       site_b_name: site_b_name !== undefined ? site_b_name : project.site_b_name,
       site_b_location: site_b_location !== undefined ? site_b_location : project.site_b_location,
-      site_b_latitude: site_b_latitude !== undefined ? site_b_latitude : project.site_b_latitude,
-      site_b_longitude: site_b_longitude !== undefined ? site_b_longitude : project.site_b_longitude,
+      site_b_latitude:
+        final_site_b_latitude !== undefined ? final_site_b_latitude : project.site_b_latitude,
+      site_b_longitude:
+        final_site_b_longitude !== undefined ? final_site_b_longitude : project.site_b_longitude,
       scope_of_work: scope_of_work !== undefined ? scope_of_work : project.scope_of_work,
       description: description !== undefined ? description : project.description
     });
@@ -521,11 +606,7 @@ router.put('/:id', protect, async (req, res) => {
     // Fetch updated project without customer association
     const updatedProject = await Project.findByPk(project.id);
 
-    res.json({
-      success: true,
-      data: updatedProject
-    });
-
+    // ✅ IMPORTANT: only respond once (your prior file had duplicate res.json)
     res.json({
       success: true,
       data: updatedProject
@@ -568,7 +649,6 @@ router.delete('/:id', protect, async (req, res) => {
       success: true,
       message: 'Project deleted successfully'
     });
-
   } catch (error) {
     console.error('Delete project error:', error);
     res.status(500).json({
