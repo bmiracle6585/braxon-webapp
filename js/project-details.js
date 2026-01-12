@@ -12,8 +12,11 @@ if (typeof window.currentProject === 'undefined') {
 // SAFE STUBS (prevents hard crashes if older code calls these)
 // ------------------------------------------
 window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTeam(projectId) {
-  console.warn('loadCurrentTeam not implemented (non-blocking). projectId=', projectId);
+  // Intentionally silent placeholder.
+  // Team widget will be wired later.
+  return;
 });
+
 
 // If these are missing on some builds, don’t crash the page
 window.initDocumentManagement = window.initDocumentManagement || function () {};
