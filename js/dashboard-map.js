@@ -39,7 +39,7 @@ class ProjectLocationMap {
     async loadProjectLocations() {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/projects', {
+            const response = await fetch('/api/projects', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
