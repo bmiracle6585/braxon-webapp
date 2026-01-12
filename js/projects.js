@@ -327,7 +327,7 @@ async function handleNewProjectSubmit(form) {
 
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/projects', {
+        const response = await fetch('/api/projects', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -361,7 +361,7 @@ async function handleNewProjectSubmit(form) {
 async function loadCustomers() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/customers', {
+        const response = await fetch('/api/customers', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const result = await response.json();
@@ -376,7 +376,7 @@ async function loadCustomers() {
 async function loadCustomers() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/customers', {
+        const response = await fetch('/api/customers', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const result = await response.json();
@@ -443,7 +443,7 @@ function addProjectCard(projectData) {
 async function loadAndDisplayProjects() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/projects', {
+        const response = await fetch('/api/projects', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
