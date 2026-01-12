@@ -421,6 +421,22 @@
                 pullDistance = 0;
             });
         }
+         function getUserId() {
+              // Legacy key
+              const legacy = localStorage.getItem('userId');
+              if (legacy && legacy !== 'null' && legacy !== 'undefined' && legacy !== '0') {
+                  const n = parseInt(legacy, 10);
+                  if (!isNaN(n) && n > 0) return n;
+              }
+
+              // New key (full user object)
+              try {
+                  const u = JSON.parse(localStorage.getItem('user') || 'null');
+                  if (u && u.id) return u.id;
+              } catch (e) {}
+
+              return null;
+          }
 
         // ========================================
         // COORDINATE PARSING - SAME AS DESKTOP
