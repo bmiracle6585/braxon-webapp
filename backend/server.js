@@ -134,6 +134,10 @@ pages.forEach(page => {
 // Static files for CSS/JS/assets - MOST GENERAL, LAST!
 app.use(express.static(path.join(__dirname, '..')));
 
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, '../icons/icon-192.png'));
+});
+
 // Error handling
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found', path: req.path });
