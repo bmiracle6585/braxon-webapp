@@ -237,11 +237,12 @@ function handleFiles(files) {
 }
 
     // Add remove functionality
-    container.querySelectorAll('.remove-file-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.closest('.uploaded-file-item').remove();
-        });
+fileList.querySelectorAll('.remove-file-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        this.closest('.uploaded-file-item')?.remove();
     });
+});
+
 
 
 // ==========================================
