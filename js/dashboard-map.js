@@ -36,59 +36,124 @@ class ProjectLocationMap {
         this.loadProjectLocations();
     }
 
+    // "36 36 39.37, -108 39 55.32" -> { lat: 36.610936..., lng: -108.665366... }
+    dmsPairToDecimal(pairStr) {
+        if (!pairStr || typeof pairStr !== 'string') return null;
+
+        const parts = pairStr.split(',').map(s => s.trim());
+        if (parts.length !== 2) return null;
+
+        const dmsToDec = (dmsStr) => {
+            const nums = dmsStr.split(/\s+/).filter(Boolean).map(Number);
+            if (nums.length < 3 || nums.some(n => Number.isNaN(n))) return null;
+
+            const deg = nums[0];
+            const min = nums[1];
+            const sec = nums[2];
+
+            const sign = deg < 0 ? -1 : 1;
+            const absDeg = Math.abs(deg);
+
+            return sign * (absDeg + (min / 60) + (sec / 3600));
+        };
+
+        const lat = dmsToDec(parts[0]);
+        const lng = dmsToDec(parts[1]);
+        if (lat === null || lng === null) return null;
+
+        return { lat, lng };
+    }
+
+    // Prefer numeric fields; otherwise parse from the DMS location string
+    getLatLng(project, site /* 'a' | 'b' */) {
+        const latKey = site === 'a' ? 'site_a_latitude' : 'site_b_latitude';
+        const lngKey = site === 'a' ? 'site_a_longitude' : 'site_b_longitude';
+        const locKey = site === 'a' ? 'site_a_location' : 'site_b_location';
+
+        let lat = project[latKey] != null ? parseFloat(project[latKey]) : null;
+        let lng = project[lngKey] != null ? parseFloat(project[lngKey]) : null;
+
+        // If numeric is missing, fall back to parsing "deg min sec, -deg min sec"
+        if ((!lat || !lng) && project[locKey]) {
+            const dec = this.dmsPairToDecimal(project[locKey]);
+            if (dec) {
+                lat = dec.lat;
+                lng = dec.lng;
+            }
+        }
+
+        // Must be valid numbers
+        if (!lat || !lng || Number.isNaN(lat) || Number.isNaN(lng)) return null;
+
+        return { lat, lng };
+    }
+
     async loadProjectLocations() {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch('/api/projects', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             const result = await response.json();
-            
-            if (result.success && result.data.length > 0) {
+
+            if (result.success && Array.isArray(result.data) && result.data.length > 0) {
                 const allSites = [];
-                
+
                 result.data.forEach(p => {
                     const week = this.determineWeek(p.start_date);
-                    
+
                     // Only show projects in THIS WEEK or NEXT WEEK
                     if (!week) return;
-                    
-                    // Add Site A if it has coordinates
-                    if (p.site_a_latitude && p.site_a_longitude) {
+
+                    // Site A (numeric OR parsed from location string)
+                    const a = this.getLatLng(p, 'a');
+                    if (a) {
                         allSites.push({
                             id: p.id,
                             projectName: p.project_name,
                             siteName: p.site_a_name || 'Site A',
                             address: p.site_a_location || 'Location not specified',
-                            lat: parseFloat(p.site_a_latitude),
-                            lng: parseFloat(p.site_a_longitude),
+                            lat: a.lat,
+                            lng: a.lng,
                             startDate: p.start_date ? new Date(p.start_date).toLocaleDateString() : 'TBD',
                             week: week
                         });
                     }
-                    
-                    // Add Site B if it has coordinates
-                    if (p.site_b_latitude && p.site_b_longitude) {
+
+                    // Site B (numeric OR parsed from location string)
+                    const b = this.getLatLng(p, 'b');
+                    if (b) {
                         allSites.push({
                             id: p.id,
                             projectName: p.project_name,
                             siteName: p.site_b_name || 'Site B',
                             address: p.site_b_location || 'Location not specified',
-                            lat: parseFloat(p.site_b_latitude),
-                            lng: parseFloat(p.site_b_longitude),
+                            lat: b.lat,
+                            lng: b.lng,
                             startDate: p.start_date ? new Date(p.start_date).toLocaleDateString() : 'TBD',
                             week: week
                         });
                     }
                 });
-                
+
                 this.categorizeProjects(allSites);
                 this.addMarkers();
                 this.fitMapToMarkers();
                 this.updateStats();
-                
-console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + this.nextWeekProjects.length + ' next week');            }
+
+                console.log(
+                    'Map loaded: ' +
+                    this.currentWeekProjects.length + ' this week, ' +
+                    this.nextWeekProjects.length + ' next week'
+                );
+            } else {
+                // Clear markers/stats if no data
+                this.categorizeProjects([]);
+                this.addMarkers();
+                this.updateStats();
+                console.log('Map loaded: 0 this week, 0 next week');
+            }
         } catch (error) {
             console.error('Load project locations error:', error);
         }
@@ -100,29 +165,29 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
      */
     determineWeek(startDate) {
         if (!startDate) return null;
-        
+
         const projectStart = new Date(startDate);
         projectStart.setHours(0, 0, 0, 0);
-        
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         // Get Sunday of current week
         const thisWeekStart = this.getWeekStart(today);
         const thisWeekEnd = this.getWeekEnd(thisWeekStart);
-        
+
         // Get Sunday of next week
         const nextWeekStart = new Date(thisWeekStart);
         nextWeekStart.setDate(nextWeekStart.getDate() + 7);
         const nextWeekEnd = this.getWeekEnd(nextWeekStart);
-        
+
         // Check which week
         if (projectStart >= thisWeekStart && projectStart <= thisWeekEnd) {
             return 'current';
         } else if (projectStart >= nextWeekStart && projectStart <= nextWeekEnd) {
             return 'next';
         }
-        
+
         return null; // Outside 2-week window (won't show on map)
     }
 
@@ -212,11 +277,11 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
         });
 
         // Add hover effects
-        marker.on('mouseover', function() {
+        marker.on('mouseover', function () {
             this.openTooltip();
         });
 
-        marker.on('mouseout', function() {
+        marker.on('mouseout', function () {
             this.closeTooltip();
         });
 
@@ -227,8 +292,8 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
         const weekLabel = project.week === 'current' ? 'This Week' : 'Next Week';
         const weekColor = project.week === 'current' ? '#10B981' : '#3B82F6';
         const bgColor = project.week === 'current' ? '#ECFDF5' : '#EFF6FF';
-        const weekIcon = project.week === 'current' 
-            ? '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>' 
+        const weekIcon = project.week === 'current'
+            ? '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>'
             : '<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/>';
 
         return `
@@ -237,7 +302,7 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
                     <div class="popup-project-name">${project.projectName}</div>
                     <div class="popup-site-name">${project.siteName}</div>
                 </div>
-                
+
                 <div class="popup-schedule" style="border-left-color: ${weekColor};">
                     <svg width="16" height="16" fill="${weekColor}" viewBox="0 0 24 24">
                         ${weekIcon}
@@ -245,14 +310,14 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
                     <span style="color: ${weekColor}; font-weight: 600;">${weekLabel}</span>
                     <span style="color: #374151;">• ${project.startDate}</span>
                 </div>
-                
+
                 <div class="popup-address">
                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                     </svg>
                     ${project.address}
                 </div>
-                
+
                 <a href="project-details.html?id=${project.id}" class="popup-view-btn">
                     View Project Details
                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
@@ -269,7 +334,7 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
         // Create bounds from all markers
         const group = L.featureGroup(this.markers);
         this.map.fitBounds(group.getBounds().pad(0.1));
-        
+
         // Optional: Set max zoom level to avoid zooming too close
         if (this.map.getZoom() > 12) {
             this.map.setZoom(12);
@@ -281,7 +346,7 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
         const currentWeekEl = document.getElementById('currentWeekCount');
         const nextWeekEl = document.getElementById('nextWeekCount');
         const totalSitesEl = document.getElementById('totalSitesCount');
-        
+
         if (currentWeekEl) currentWeekEl.textContent = this.currentWeekProjects.length;
         if (nextWeekEl) nextWeekEl.textContent = this.nextWeekProjects.length;
         if (totalSitesEl) totalSitesEl.textContent = this.markers.length;
@@ -310,13 +375,13 @@ console.log('Map loaded: ' + this.currentWeekProjects.length + ' this week, ' + 
     addProject(project) {
         const marker = this.createMarker(project, project.week);
         this.markers.push(marker);
-        
+
         if (project.week === 'current') {
             this.currentWeekProjects.push(project);
         } else {
             this.nextWeekProjects.push(project);
         }
-        
+
         this.updateStats();
     }
 }
