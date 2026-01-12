@@ -261,19 +261,26 @@
                         Deployment Team
                     </h3>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button onclick="openTeamModal()" style="padding: 0.5rem 1rem; font-size: 0.875rem; background: #DC143C; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Add Team Member
-                        </button>
-                        <button onclick="openEditTeamModal()" id="editTeamBtn" style="padding: 0.5rem 1rem; font-size: 0.875rem; background: #2B5B8E; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none; align-items: center; gap: 0.5rem;">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit Team
-                        </button>
-                    </div>
+  <button
+    id="addTeamMemberBtn"
+    type="button"
+    style="padding: 0.5rem 1rem; font-size: 0.875rem; background: #DC2626; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    </svg>
+    Add Team Member
+  </button>
+
+  <button
+    id="editTeamBtn"
+    type="button"
+    style="padding: 0.5rem 1rem; font-size: 0.875rem; background: #2B5B8E; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: none; align-items: center; gap: 0.5rem;">
+    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+    Edit Team
+  </button>
+</div>
                 </div>
 
                 <!-- Team Members Grid -->
