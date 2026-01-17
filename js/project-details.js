@@ -334,12 +334,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const token = localStorage.getItem('token');
 
-    console.log('ADD TEAM POST payload (about to send):', {
-  projectId,
+  console.log('ADD TEAM POST payload (about to send):', {
+  pid,
   user_id,
   role,
-  roleSelectValue: teamRoleSelect?.value,
+roleSelectValue: document.getElementById('teamRoleSelect')?.value,
 });
+
 
 
     const res = await fetch(`${window.API_BASE || ''}/api/team/project/${pid}/members`, {
