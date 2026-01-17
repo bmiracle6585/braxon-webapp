@@ -729,15 +729,22 @@ async function loadPocsForEdit(customerId) {
 
     select.innerHTML = '<option value="">Select POC...</option>';
 
-    result.data.forEach(poc => {
-      const opt = document.createElement('option');
-      opt.value = poc.id || poc.name;
-      opt.textContent = poc.name || poc.email;
-      if (window.currentProject?.customer_poc == opt.value) {
-        opt.selected = true;
-      }
-      select.appendChild(opt);
-    });
+result.data.forEach(poc => {
+  const opt = document.createElement('option');
+
+  // POC is stored as a STRING on the project (email or name)
+  const pocValue = poc.email || poc.name;
+
+  opt.value = pocValue;
+  opt.textContent = poc.name || poc.email;
+
+  if (window.currentProject?.customer_poc === pocValue) {
+    opt.selected = true;
+  }
+
+  select.appendChild(opt);
+});
+
   } catch (err) {
     console.error('Load POCs error:', err);
   }
