@@ -43,6 +43,61 @@ document.getElementById('teamModalOverlay')?.addEventListener('click', (e) => {
   if (e.target && e.target.id === 'teamModalOverlay') window.closeTeamModal();
 });
 
+async function loadUsersIntoTeamModal() {
+  const select = document.getElementById('teamMemberSelect'); // must exist in HTML
+  if (!select) {
+    console.warn('teamMemberSelect not found');
+    return;
+  }
+
+  // Show loading state
+  select.innerHTML = `<option value="">Loading users...</option>`;
+  select.disabled = true;
+
+  try {
+    const res = await fetch(`${window.API_BASE || ''}/api/users`, {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!res.ok) {
+      throw new Error(`GET /api/users failed: ${res.status}`);
+    }
+
+    const users = await res.json();
+
+    // Build options
+    select.innerHTML = `<option value="">Select a team member...</option>`;
+    users.forEach(u => {
+      const label =
+        (u.fullName || u.name || '').trim() ||
+        (u.email || '').trim() ||
+        `User ${u.id}`;
+
+      const opt = document.createElement('option');
+      opt.value = u.id;
+      opt.textContent = label;
+      select.appendChild(opt);
+    });
+
+    select.disabled = false;
+  } catch (err) {
+    console.error(err);
+    select.innerHTML = `<option value="">Failed to load users</option>`;
+  }
+}
+window.openTeamModal = function () {
+  const overlay = document.getElementById('teamModalOverlay');
+  if (!overlay) {
+    console.warn('teamModalOverlay not found');
+    return;
+  }
+  overlay.style.display = 'flex';
+  loadUsersIntoTeamModal(); // ← ADD THIS LINE
+};
+
+
+
 // ==========================================
 // INIT
 // ==========================================
