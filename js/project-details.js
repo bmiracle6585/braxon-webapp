@@ -312,7 +312,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------
   // Add Team Member Form Submit
   // ------------------------------------------
-  document.getElementById('addTeamMemberForm')?.addEventListener('submit', async (e) => {
+ (function wireAddTeamMemberFormOnce() {
+  const form = document.getElementById('addTeamMemberForm');
+  if (!form) return;
+
+  // Prevent double-binding across multiple init paths
+  if (form.dataset.bound === 'true') return;
+  form.dataset.bound = 'true';
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const pid = new URLSearchParams(window.location.search).get('id');
@@ -342,8 +350,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     alert('Added to team');
-    loadProjectTeamMembers(pid); // refresh team list
+    loadProjectTeamMembers(pid); // refresh both modal + widget
   });
+})();
 
   // ------------------------------------------
   // Page Initialization Order
