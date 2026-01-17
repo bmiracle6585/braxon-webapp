@@ -19,42 +19,29 @@ window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTe
 // ------------------------------------------
 // TEAM MODAL (placeholder so button works)
 // ------------------------------------------
-// ================================
-// TEAM MODAL (TEMP / WIRED STUB)
-// ================================
-
-window.openTeamModal = function openTeamModal() {
-  console.log('👥 openTeamModal fired');
-
-  // Visual confirmation (non-blocking, removable later)
-  const msg = document.createElement('div');
-  msg.textContent = 'Team modal hook fired (UI not wired yet)';
-  msg.style.position = 'fixed';
-  msg.style.bottom = '20px';
-  msg.style.right = '20px';
-  msg.style.padding = '10px 14px';
-  msg.style.background = '#111';
-  msg.style.color = '#fff';
-  msg.style.borderRadius = '8px';
-  msg.style.fontSize = '13px';
-  msg.style.zIndex = '9999';
-  document.body.appendChild(msg);
-
-  setTimeout(() => msg.remove(), 2000);
+// --- Team Modal: real open/close wiring (UI only) ---
+window.openTeamModal = function () {
+  const overlay = document.getElementById('teamModalOverlay');
+  if (!overlay) {
+    console.warn('teamModalOverlay not found');
+    return;
+  }
+  overlay.style.display = 'flex';
 };
 
-window.closeTeamModal = function closeTeamModal() {
-  console.log('👥 closeTeamModal fired');
+window.closeTeamModal = function () {
+  const overlay = document.getElementById('teamModalOverlay');
+  if (overlay) overlay.style.display = 'none';
 };
 
-// ================================
-// SAFE NO-OP FALLBACKS (DO NOT TOUCH)
-// ================================
+// Wire close buttons (safe optional chaining)
+document.getElementById('closeTeamModalBtn')?.addEventListener('click', window.closeTeamModal);
+document.getElementById('teamModalCancelBtn')?.addEventListener('click', window.closeTeamModal);
 
-window.initDocumentManagement ||= function () {};
-window.initDailyUpdates ||= function () {};
-window.initEditSiteInfo ||= function () {};
-
+// Optional: click outside modal closes it
+document.getElementById('teamModalOverlay')?.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'teamModalOverlay') window.closeTeamModal();
+});
 
 // ==========================================
 // INIT
