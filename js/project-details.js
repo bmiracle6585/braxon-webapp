@@ -720,7 +720,7 @@ async function loadPocsForEdit(customerId) {
 
   try {
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/customers/${customerId}/contacts`, {
+    const res = await fetch(`/api/customers/${customerId}/pocs`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
