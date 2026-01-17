@@ -20,6 +20,9 @@ window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTe
 // TEAM MODAL (Deployment Team)
 // ------------------------------------------
 
+let teamLoadSeq = 0;
+
+
 // Close modal
 window.closeTeamModal = function () {
   const overlay = document.getElementById('teamModalOverlay');
@@ -98,6 +101,8 @@ async function loadUsersIntoTeamModal() {
 
 // Load / render team members list (Modal + Main Widget) + Remove
 async function loadProjectTeamMembers(projectId) {
+  const seq = ++teamLoadSeq;
+
   const modalList = document.getElementById('currentTeamList');
   const widgetList = document.getElementById('teamMembersList');
 
@@ -133,6 +138,7 @@ async function loadProjectTeamMembers(projectId) {
     }
 
     const payload = await res.json();
+    if (seq !== teamLoadSeq) return; // ignore stale response
     const members = payload.data || [];
 
     if (!members.length) {
