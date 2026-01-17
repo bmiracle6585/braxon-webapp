@@ -704,9 +704,10 @@ async function loadCustomersForEdit(selectedCustomerId) {
 
     select.onchange = e => loadPocsForEdit(e.target.value);
 
-    if (selectedCustomerId) {
-      loadPocsForEdit(selectedCustomerId);
-    }
+if (selectedCustomerId) {
+  loadPocsForEdit(selectedCustomerId);
+  select.dispatchEvent(new Event('change'));
+}
   } catch (err) {
     console.error('Load customers error:', err);
   }
