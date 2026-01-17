@@ -698,7 +698,9 @@ async function loadCustomersForEdit(selectedCustomerId) {
       const opt = document.createElement('option');
       opt.value = c.id;
       opt.textContent = c.name || c.customer_name;
-      if (c.id === selectedCustomerId) opt.selected = true;
+      if (String(c.id) === String(selectedCustomerId)) {
+  opt.selected = true;
+}
       select.appendChild(opt);
     });
 
