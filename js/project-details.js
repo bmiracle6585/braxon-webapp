@@ -625,22 +625,12 @@ function formatStatus(status) {
 }
 
 // ==========================================
-// EDIT SITE INFO (MODAL)
+// EDIT SITE INFO (MODAL) — REBUILT
 // ==========================================
+
 function initEditSiteInfo() {
   const editBtn = document.getElementById('editSiteInfoBtn');
   if (editBtn) editBtn.addEventListener('click', openEditModal);
-}
-
-function wireEditFormSubmitOnce() {
-  const form = document.getElementById('editProjectForm');
-  if (!form) return;
-
-  // prevent double-binding
-  if (form.dataset.bound === '1') return;
-  form.dataset.bound = '1';
-
-  form.addEventListener('submit', handleEditSubmit);
 }
 
 function openEditModal() {
@@ -650,6 +640,7 @@ function openEditModal() {
   }
 
   populateEditModal();
+
   const modal = document.getElementById('editSiteModal');
   if (!modal) return;
 
@@ -660,46 +651,42 @@ function openEditModal() {
 function closeEditModal() {
   const modal = document.getElementById('editSiteModal');
   if (modal) modal.style.display = 'none';
-  document.body.style.overflow = '';
 
-  const form = document.getElementById('editProjectForm');
-  if (form) form.reset();
+  document.body.style.overflow = '';
+  document.getElementById('editProjectForm')?.reset();
 }
 
 function populateEditModal() {
   const p = window.currentProject;
   if (!p) return;
 
-  // Populate fields
-  setValue('editCustomerId', p.customer_id || '');
-  setValue('editCustomerPoc', p.customer_poc || '');
-  setValue('editProjectName', p.project_name || '');
-  setValue('editScopeOfWork', p.scope_of_work || '');
-  setValue('editProjectStatus', p.status || 'pending');
-  setValue('editSiteAName', p.site_a_name || '');
-  setValue('editSiteBName', p.site_b_name || '');
-  setValue('editSiteALocation', p.site_a_location || '');
-  setValue('editSiteBLocation', p.site_b_location || '');
-  setValue('editStartDate', p.start_date || '');
-  setValue('editEndDate', p.end_date || '');
-  setValue('editProjectDescription', p.description || '');
+  setVal('editProjectName', p.project_name);
+  setVal('editScopeOfWork', p.scope_of_work);
+  setVal('editProjectStatus', p.status);
+  setVal('editSiteAName', p.site_a_name);
+  setVal('editSiteBName', p.site_b_name);
+  setVal('editSiteALocation', p.site_a_location);
+  setVal('editSiteBLocation', p.site_b_location);
+  setVal('editStartDate', p.start_date);
+  setVal('editEndDate', p.end_date);
+  setVal('editProjectDescription', p.description);
 
-  loadCustomersForEdit();
+  loadCustomersForEdit(p.customer_id);
 }
 
-function setValue(id, val) {
+function setVal(id, val) {
   const el = document.getElementById(id);
-  if (el) el.value = val;
+  if (el) el.value = val ?? '';
 }
 
-async function loadCustomersForEdit() {
+async function loadCustomersForEdit(selectedCustomerId) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/customers', {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const res = await fetch('/api/customers', {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
-    const result = await response.json();
+    const result = await res.json();
     if (!result.success) return;
 
     const select = document.getElementById('editCustomerId');
@@ -707,90 +694,106 @@ async function loadCustomersForEdit() {
 
     select.innerHTML = '<option value="">Select customer...</option>';
 
-    result.data.forEach(customer => {
-      const option = document.createElement('option');
-      option.value = customer.id;
-      option.textContent = customer.name || customer.customer_name || `Customer ${customer.id}`;
-      if (window.currentProject && customer.id === window.currentProject.customer_id) {
-        option.selected = true;
-      }
-      select.appendChild(option);
+    result.data.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name || c.customer_name;
+      if (c.id === selectedCustomerId) opt.selected = true;
+      select.appendChild(opt);
     });
-  } catch (error) {
-    console.error('Load customers error:', error);
+
+    select.onchange = e => loadPocsForEdit(e.target.value);
+
+    if (selectedCustomerId) {
+      loadPocsForEdit(selectedCustomerId);
+    }
+  } catch (err) {
+    console.error('Load customers error:', err);
+  }
+}
+
+async function loadPocsForEdit(customerId) {
+  const select = document.getElementById('editCustomerPoc');
+  if (!select || !customerId) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`/api/customers/${customerId}/contacts`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const result = await res.json();
+    if (!result.success) return;
+
+    select.innerHTML = '<option value="">Select POC...</option>';
+
+    result.data.forEach(poc => {
+      const opt = document.createElement('option');
+      opt.value = poc.id || poc.name;
+      opt.textContent = poc.name || poc.email;
+      if (window.currentProject?.customer_poc == opt.value) {
+        opt.selected = true;
+      }
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Load POCs error:', err);
   }
 }
 
 async function handleEditSubmit(e) {
   e.preventDefault();
 
-  if (!window.currentProject) {
-    showNotification('Project data not loaded', 'error');
-    return false;
-  }
+  const p = window.currentProject;
+  if (!p) return;
 
-  const formData = new FormData(e.target);
+  const form = e.target;
+  const data = new FormData(form);
 
-  const updatedData = {
-    customer_id: formData.get('customer_id') || null,
-    customer_poc: formData.get('customer_poc'),
-    project_name: formData.get('project_name'),
-    scope_of_work: formData.get('scope_of_work'),
-    status: formData.get('status'),
-    site_a_name: formData.get('site_a_name'),
-    site_b_name: formData.get('site_b_name'),
-    site_a_location: formData.get('site_a_location'),
-    site_b_location: formData.get('site_b_location'),
-    start_date: formData.get('start_date'),
-    end_date: formData.get('end_date'),
-    description: formData.get('description')
+  const payload = {
+    customer_id: data.get('customer_id') || null,
+    customer_poc: data.get('customer_poc') || null,
+    project_name: data.get('project_name'),
+    scope_of_work: data.get('scope_of_work'),
+    status: data.get('status'),
+    site_a_name: data.get('site_a_name'),
+    site_b_name: data.get('site_b_name'),
+    site_a_location: data.get('site_a_location'),
+    site_b_location: data.get('site_b_location'),
+    start_date: data.get('start_date'),
+    end_date: data.get('end_date'),
+    description: data.get('description')
   };
-
-  // Parse coords if location changed (supports DMS pair string)
-  if (updatedData.site_a_location && updatedData.site_a_location !== window.currentProject.site_a_location) {
-    const coordsA = parseCoordinates(updatedData.site_a_location);
-    if (coordsA.lat != null && coordsA.lng != null) {
-      updatedData.site_a_latitude = coordsA.lat;
-      updatedData.site_a_longitude = coordsA.lng;
-    }
-  }
-
-  if (updatedData.site_b_location && updatedData.site_b_location !== window.currentProject.site_b_location) {
-    const coordsB = parseCoordinates(updatedData.site_b_location);
-    if (coordsB.lat != null && coordsB.lng != null) {
-      updatedData.site_b_latitude = coordsB.lat;
-      updatedData.site_b_longitude = coordsB.lng;
-    }
-  }
 
   try {
     const token = localStorage.getItem('token');
-
-    const response = await fetch(`/api/projects/${window.currentProject.id}`, {
+    const res = await fetch(`/api/projects/${p.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(updatedData)
+      body: JSON.stringify(payload)
     });
 
-    const result = await response.json();
+    const result = await res.json();
 
     if (result.success) {
-      showNotification('Project updated successfully!', 'success');
+      showNotification('Project updated', 'success');
       closeEditModal();
-      setTimeout(() => window.location.reload(), 800);
+      setTimeout(() => location.reload(), 500);
     } else {
-      showNotification('Error: ' + (result.message || 'Update failed'), 'error');
+      showNotification(result.message || 'Update failed', 'error');
     }
-  } catch (error) {
-    console.error('Update error:', error);
-    showNotification('Failed to update project', 'error');
+  } catch (err) {
+    console.error('Edit project error:', err);
+    showNotification('Update failed', 'error');
   }
-
-  return false;
 }
+
+document
+  .getElementById('editProjectForm')
+  ?.addEventListener('submit', handleEditSubmit);
 
 // ==========================================
 // COORD PARSER (supports your DMS format)
