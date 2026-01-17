@@ -153,86 +153,86 @@ async function loadProjectTeamMembers(projectId) {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Page loaded');
 
-function initTeamButtons() {
-  const addBtn = document.getElementById('addTeamMemberBtn');
-  const editBtn = document.getElementById('editTeamBtn');
+  // ------------------------------------------
+  // Team Buttons
+  // ------------------------------------------
+  function initTeamButtons() {
+    const addBtn = document.getElementById('addTeamMemberBtn');
+    const editBtn = document.getElementById('editTeamBtn');
 
-  if (addBtn) {
-    addBtn.addEventListener('click', () => {
-      if (typeof window.openTeamModal === 'function') {
-        window.openTeamModal();
-      } else {
-        console.warn('openTeamModal is not defined');
-      }
-    });
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        if (typeof window.openTeamModal === 'function') {
+          window.openTeamModal();
+        } else {
+          console.warn('openTeamModal is not defined');
+        }
+      });
+    }
+
+    if (editBtn) {
+      addBtn?.style.setProperty('display', 'inline-flex');
+      editBtn.addEventListener('click', () => {
+        if (typeof window.openEditTeamModal === 'function') {
+          window.openEditTeamModal();
+        } else {
+          console.warn('openEditTeamModal is not defined');
+        }
+      });
+    }
   }
 
-  if (editBtn) {
-    editBtn.addEventListener('click', () => {
-      if (typeof window.openEditTeamModal === 'function') {
-        window.openEditTeamModal();
-      } else {
-        console.warn('openEditTeamModal is not defined');
-      }
-    });
-  }
-}  
+  // ------------------------------------------
+  // Add Team Member Form Submit
+  // ------------------------------------------
   document.getElementById('addTeamMemberForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const pid = new URLSearchParams(window.location.search).get('id');
-  if (!pid) return alert('Project ID not found');
+    const pid = new URLSearchParams(window.location.search).get('id');
+    if (!pid) return alert('Project ID not found');
 
-  const user_id = document.getElementById('teamMemberSelect')?.value;
-  const role = document.getElementById('teamRoleSelect')?.value;
-  const notes = document.getElementById('teamNotes')?.value || '';
+    const user_id = document.getElementById('teamMemberSelect')?.value;
+    const role = document.getElementById('teamRoleSelect')?.value;
+    const notes = document.getElementById('teamNotes')?.value || '';
 
-  if (!user_id) return alert('Select a team member');
+    if (!user_id) return alert('Select a team member');
 
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  const res = await fetch(`${window.API_BASE || ''}/api/team/project/${pid}/members`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ user_id, role, notes })
+    const res = await fetch(`${window.API_BASE || ''}/api/team/project/${pid}/members`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ user_id, role, notes })
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      console.error('Add team member failed:', res.status, txt);
+      return alert(`Add failed: ${res.status}`);
+    }
+
+    alert('Added to team');
+    loadProjectTeamMembers(pid); // refresh team list
   });
 
-  if (!res.ok) {
-    const txt = await res.text().catch(() => '');
-    console.error('Add team member failed:', res.status, txt);
-    return alert(`Add failed: ${res.status}`);
-  }
+  // ------------------------------------------
+  // Page Initialization Order
+  // ------------------------------------------
+  const pid = new URLSearchParams(window.location.search).get('id');
 
-  alert('Added to team');
-});
-
-
-   // 🔑 MUST COME FIRST
   initTeamButtons();
-  
-  // Ensure links that depend on projectId are set early
   setDynamicLinks();
-
-  // Load project first (so currentProject is available)
   loadProjectData();
-
-  // Load module data (photo documentation)
   loadModuleData();
-
-  // Initialize page functionality
   initProjectDetailsPage();
-
-  // Initialize status change listener
   initStatusChange();
-
-  // Show delete button for admins
   showDeleteButtonIfAdmin();
-
-  // Wire edit form submit once (no cloneNode hacks)
   wireEditFormSubmitOnce();
+
+  if (pid) loadProjectTeamMembers(pid);
 });
 
 // ==========================================
