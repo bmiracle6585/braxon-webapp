@@ -1,9 +1,30 @@
 // backend/routes/customers.js
 const express = require('express');
 const router = express.Router();
-const { Customer, Project, CustomerContact } = require('../models');
+const { Customer, Project } = require('../models');
 const { protect } = require('../middleware/auth');
 const { Op } = require('sequelize');
+
+// Build a "POC list" from the single contact fields on Customer
+function buildPocsFromCustomer(customer) {
+  if (!customer) return [];
+
+  const name = customer.contact_name || customer.customer_pm || null;
+  const email = customer.contact_email || null;
+  const phone = customer.contact_phone || null;
+
+  // If nothing exists, return empty list (keeps UI sane)
+  if (!name && !email && !phone) return [];
+
+  return [
+    {
+      id: customer.id,
+      name,
+      email,
+      phone
+    }
+  ];
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -62,12 +83,30 @@ router.get('/', protect, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
-| GET CUSTOMER POCs (CONTACTS)
+| GET CUSTOMER CONTACTS (COMPAT)  /api/customers/:id/contacts
 |--------------------------------------------------------------------------
-| Returns contacts for a customer. Falls back to the single contact fields on
-| Customer if no CustomerContact records exist.
-|
-| GET /api/customers/:id/pocs
+| Frontend currently calls this. Return a list (even if 1 item).
+*/
+router.get('/:id/contacts', protect, async (req, res) => {
+  try {
+    const customer = await Customer.findByPk(req.params.id);
+    if (!customer) {
+      return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+
+    const data = buildPocsFromCustomer(customer);
+    return res.json({ success: true, count: data.length, data });
+  } catch (error) {
+    console.error('Get customer contacts error:', error);
+    res.status(500).json({ success: false, message: 'Error fetching contacts' });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
+| GET CUSTOMER POCs (ALIAS) /api/customers/:id/pocs
+|--------------------------------------------------------------------------
+| Keeps your newer JS path working too.
 */
 router.get('/:id/pocs', protect, async (req, res) => {
   try {
@@ -76,30 +115,11 @@ router.get('/:id/pocs', protect, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
-    let contacts = [];
-    if (CustomerContact) {
-      contacts = await CustomerContact.findAll({
-        where: { customer_id: customer.id },
-        order: [['name', 'ASC']]
-      });
-    }
-
-    // Fallback to Customer's single contact fields (legacy)
-    if ((!contacts || contacts.length === 0) && (customer.contact_name || customer.contact_email)) {
-      contacts = [
-        {
-          id: null,
-          name: customer.contact_name || null,
-          email: customer.contact_email || null,
-          phone: customer.contact_phone || null
-        }
-      ];
-    }
-
-    return res.json({ success: true, count: contacts.length, data: contacts });
+    const data = buildPocsFromCustomer(customer);
+    return res.json({ success: true, count: data.length, data });
   } catch (error) {
     console.error('Get customer POCs error:', error);
-    res.status(500).json({ success: false, message: 'Error fetching customer POCs' });
+    res.status(500).json({ success: false, message: 'Error fetching POCs' });
   }
 });
 
