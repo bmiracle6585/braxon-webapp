@@ -94,18 +94,12 @@ router.delete('/project/:projectId/members/:userId', authMiddleware, async (req,
     );
 
     if (!affected) {
-      return res.status(404).json({
-        success: false,
-        message: 'Team member not found or already removed'
-      });
+      return res.status(404).json({ success: false, message: 'Team member not found or already removed' });
     }
 
-    return res.json({
-      success: true,
-      message: 'Team member removed successfully'
-    });
+    return res.json({ success: true, message: 'Team member removed successfully' });
   } catch (err) {
-    console.error('REMOVE team member error:', err);
+    console.error('DELETE team member error:', err);
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 });
