@@ -126,72 +126,71 @@ router.get('/project/:projectId/members', async (req, res) => {
 });
 
 // ==========================================
-// ADD TEAM MEMBER TO PROJECT
+// ADD / UPDATE TEAM MEMBER ON PROJECT (UPSERT)
+// - If exists (active or inactive): set is_active=true and UPDATE role/dates/notes
+// - If not exists: create new
 // ==========================================
 router.post('/project/:projectId/members', async (req, res) => {
-    try {
-        const { projectId } = req.params;
-        const { user_id, role, start_date, end_date, notes } = req.body;
+  try {
+    const { projectId } = req.params;
+    const { user_id, role, start_date, end_date, notes } = req.body;
 
-        // Check if already assigned
-        const existing = await ProjectTeamMember.findOne({
-            where: { project_id: projectId, user_id }
-        });
+    // Find any existing assignment (active OR inactive)
+    const existing = await ProjectTeamMember.findOne({
+      where: { project_id: projectId, user_id }
+    });
 
-        if (existing) {
-            // Reactivate if inactive
-            if (!existing.is_active) {
-                await existing.update({ is_active: true });
-                
-                // Include user data in response
-                const updated = await ProjectTeamMember.findOne({
-                    where: { id: existing.id },
-                    include: [{ model: User, as: 'User', attributes: ['id', 'full_name', 'email', 'role'] }]
-                });
-                
-                return res.json({
-                    success: true,
-                    message: 'Team member reactivated',
-                    data: updated
-                });
-            }
-            
-            return res.status(400).json({
-                success: false,
-                message: 'User already assigned to this project'
-            });
-        }
+    if (existing) {
+      await existing.update({
+        is_active: true,
+        role: role || existing.role || 'technician',
+        start_date: start_date ?? existing.start_date,
+        end_date: end_date ?? existing.end_date,
+        notes: notes ?? existing.notes
+      });
 
-        const assignment = await ProjectTeamMember.create({
-            project_id: projectId,
-            user_id,
-            role: role || 'technician',
-            assigned_date: new Date(),
-            start_date,
-            end_date,
-            notes
-        });
+      const updated = await ProjectTeamMember.findOne({
+        where: { id: existing.id },
+        include: [{ model: User, as: 'User', attributes: ['id', 'full_name', 'email', 'role'] }]
+      });
 
-        // Fetch with user data
-        const created = await ProjectTeamMember.findOne({
-            where: { id: assignment.id },
-            include: [{ model: User, as: 'User', attributes: ['id', 'full_name', 'email', 'role'] }]
-        });
-
-        res.json({
-            success: true,
-            message: 'Team member added successfully',
-            data: created
-        });
-    } catch (error) {
-        console.error('Error adding team member:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to add team member',
-            error: error.message
-        });
+      return res.json({
+        success: true,
+        message: 'Team member updated successfully',
+        data: updated
+      });
     }
+
+    const assignment = await ProjectTeamMember.create({
+      project_id: projectId,
+      user_id,
+      role: role || 'technician',
+      assigned_date: new Date(),
+      start_date,
+      end_date,
+      notes
+    });
+
+    const created = await ProjectTeamMember.findOne({
+      where: { id: assignment.id },
+      include: [{ model: User, as: 'User', attributes: ['id', 'full_name', 'email', 'role'] }]
+    });
+
+    return res.json({
+      success: true,
+      message: 'Team member added successfully',
+      data: created
+    });
+  } catch (error) {
+    console.error('Error adding/updating team member:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to add/update team member',
+      error: error.message
+    });
+  }
 });
+
 
 // ==========================================
 // REMOVE TEAM MEMBER FROM PROJECT (SOFT DELETE)
