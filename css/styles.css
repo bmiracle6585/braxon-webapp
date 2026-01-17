@@ -8361,3 +8361,26 @@ body.access-restricted .access-denied-overlay {
     background: #fee2e2;
     color: #ef4444;
 }
+
+/* ================================
+   TEAM MODAL (Project Details)
+================================ */
+#teamModalOverlay{
+  position: fixed;
+  inset: 0;
+  display: none;              /* JS toggles to flex */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 10000;
+}
+
+#teamModal{
+  background: #111;
+  color: #fff;
+  width: 92%;
+  max-width: 520px;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
