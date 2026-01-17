@@ -20,14 +20,6 @@ window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTe
 // TEAM MODAL (placeholder so button works)
 // ------------------------------------------
 // --- Team Modal: real open/close wiring (UI only) ---
-window.openTeamModal = function () {
-  const overlay = document.getElementById('teamModalOverlay');
-  if (!overlay) {
-    console.warn('teamModalOverlay not found');
-    return;
-  }
-  overlay.style.display = 'flex';
-};
 
 window.closeTeamModal = function () {
   const overlay = document.getElementById('teamModalOverlay');
@@ -102,6 +94,57 @@ window.openTeamModal = function () {
   loadUsersIntoTeamModal(); // ← ADD THIS LINE
 };
 
+async function loadProjectTeamMembers(projectId) {
+  const list = document.getElementById('currentTeamList');
+  if (!list) {
+    console.warn('currentTeamList not found');
+    return;
+  }
+
+  list.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:1rem;">Loading team...</p>`;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${window.API_BASE || ''}/api/team/project/${projectId}/members`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      console.error('Load team failed:', res.status, txt);
+      list.innerHTML = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team (${res.status})</p>`;
+      return;
+    }
+
+    const payload = await res.json();
+    const members = payload.data || [];
+
+    if (!members.length) {
+      list.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:1rem;">No team members yet</p>`;
+      return;
+    }
+
+    list.innerHTML = '';
+    members.forEach(m => {
+      const u = m.User || {};
+      const name = u.full_name || u.fullName || u.name || u.email || `User ${m.user_id}`;
+      const role = m.role || 'technician';
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;border:1px solid #e2e8f0;border-radius:10px;background:#fff;';
+      row.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:0.15rem;">
+          <div style="font-weight:700;color:#1e293b;">${name}</div>
+          <div style="font-size:0.85rem;color:#64748b;">${role}</div>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team</p>`;
+  }
+}
 
 
 // ==========================================
