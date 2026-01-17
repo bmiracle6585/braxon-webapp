@@ -106,8 +106,7 @@ router.get('/:id/contacts', protect, async (req, res) => {
 |--------------------------------------------------------------------------
 | GET CUSTOMER POCs (ALIAS) /api/customers/:id/pocs
 |--------------------------------------------------------------------------
-| Keeps your newer JS path working too.
-*/
+// Get customer POCs (primary route)
 router.get('/:id/pocs', protect, async (req, res) => {
   try {
     const customer = await Customer.findByPk(req.params.id);
@@ -120,6 +119,22 @@ router.get('/:id/pocs', protect, async (req, res) => {
   } catch (error) {
     console.error('Get customer POCs error:', error);
     res.status(500).json({ success: false, message: 'Error fetching POCs' });
+  }
+});
+
+// BACKWARDS-COMPAT ALIAS — frontend calls /contacts
+router.get('/:id/contacts', protect, async (req, res) => {
+  try {
+    const customer = await Customer.findByPk(req.params.id);
+    if (!customer) {
+      return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+
+    const data = buildPocsFromCustomer(customer);
+    return res.json({ success: true, count: data.length, data });
+  } catch (error) {
+    console.error('Get customer contacts error:', error);
+    res.status(500).json({ success: false, message: 'Error fetching contacts' });
   }
 });
 
