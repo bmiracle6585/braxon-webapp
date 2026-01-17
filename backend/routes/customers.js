@@ -1,7 +1,7 @@
 // backend/routes/customers.js
 const express = require('express');
 const router = express.Router();
-const { Customer, Project } = require('../models');
+const { Customer, Project, CustomerContact } = require('../models');
 const { protect } = require('../middleware/auth');
 const { Op } = require('sequelize');
 
@@ -57,6 +57,49 @@ router.get('/', protect, async (req, res) => {
   } catch (error) {
     console.error('Get customers error:', error);
     res.status(500).json({ success: false, message: 'Error fetching customers' });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
+| GET CUSTOMER POCs (CONTACTS)
+|--------------------------------------------------------------------------
+| Returns contacts for a customer. Falls back to the single contact fields on
+| Customer if no CustomerContact records exist.
+|
+| GET /api/customers/:id/pocs
+*/
+router.get('/:id/pocs', protect, async (req, res) => {
+  try {
+    const customer = await Customer.findByPk(req.params.id);
+    if (!customer) {
+      return res.status(404).json({ success: false, message: 'Customer not found' });
+    }
+
+    let contacts = [];
+    if (CustomerContact) {
+      contacts = await CustomerContact.findAll({
+        where: { customer_id: customer.id },
+        order: [['name', 'ASC']]
+      });
+    }
+
+    // Fallback to Customer's single contact fields (legacy)
+    if ((!contacts || contacts.length === 0) && (customer.contact_name || customer.contact_email)) {
+      contacts = [
+        {
+          id: null,
+          name: customer.contact_name || null,
+          email: customer.contact_email || null,
+          phone: customer.contact_phone || null
+        }
+      ];
+    }
+
+    return res.json({ success: true, count: contacts.length, data: contacts });
+  } catch (error) {
+    console.error('Get customer POCs error:', error);
+    res.status(500).json({ success: false, message: 'Error fetching customer POCs' });
   }
 });
 
