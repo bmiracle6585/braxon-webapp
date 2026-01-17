@@ -537,10 +537,11 @@ function displayModuleData(data) {
 // PAGE FEATURES
 // ==========================================
 function initProjectDetailsPage() {
-  initDailyUpdates();
-  initDocumentManagement();
-  initEditSiteInfo();
+  if (typeof initDailyUpdates === 'function') initDailyUpdates();
+  if (typeof initDocumentManagement === 'function') initDocumentManagement();
+  if (typeof initEditSiteInfo === 'function') initEditSiteInfo();
 }
+
 
 // ==========================================
 // STATUS CHANGE
