@@ -193,38 +193,43 @@ router.post('/project/:projectId/members', async (req, res) => {
 });
 
 // ==========================================
-// REMOVE TEAM MEMBER FROM PROJECT
+// REMOVE TEAM MEMBER FROM PROJECT (SOFT DELETE)
 // ==========================================
-router.delete('/project/:projectId/members/:userId', async (req, res) => {
-    try {
-        const { projectId, userId } = req.params;
+router.delete('/project/:projectId/members/:userId', authMiddleware, async (req, res) => {
+  const { projectId, userId } = req.params;
 
-        const assignment = await ProjectTeamMember.findOne({
-            where: { project_id: projectId, user_id: userId }
-        });
-
-        if (!assignment) {
-            return res.status(404).json({
-                success: false,
-                message: 'Team member not found on this project'
-            });
+  try {
+    const [affected] = await ProjectTeamMember.update(
+      { is_active: false },
+      {
+        where: {
+          project_id: projectId,
+          user_id: userId,
+          is_active: true
         }
+      }
+    );
 
-        // Soft delete (mark as inactive)
-        await assignment.update({ is_active: false });
-
-        res.json({
-            success: true,
-            message: 'Team member removed successfully'
-        });
-    } catch (error) {
-        console.error('Error removing team member:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to remove team member' 
-        });
+    if (!affected) {
+      return res.status(404).json({
+        success: false,
+        message: 'Team member not found or already removed'
+      });
     }
+
+    return res.json({
+      success: true,
+      message: 'Team member removed successfully'
+    });
+  } catch (error) {
+    console.error('Error removing team member:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to remove team member'
+    });
+  }
 });
+
 
 // ==========================================
 // GET BRAXON EMPLOYEES (for dropdown)
