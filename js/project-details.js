@@ -69,7 +69,8 @@ const res = await fetch(`${window.API_BASE || ''}/api/users`, {
       throw new Error(`GET /api/users failed: ${res.status}`);
     }
 
-    const users = await res.json();
+const payload = await res.json();
+const users = Array.isArray(payload) ? payload : (payload.users || payload.data || []);
 
     // Build options
     select.innerHTML = `<option value="">Select a team member...</option>`;
