@@ -55,10 +55,15 @@ async function loadUsersIntoTeamModal() {
   select.disabled = true;
 
   try {
-    const res = await fetch(`${window.API_BASE || ''}/api/users`, {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const token = localStorage.getItem('token');
+
+const res = await fetch(`${window.API_BASE || ''}/api/users`, {
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  }
+});
+
 
     if (!res.ok) {
       throw new Error(`GET /api/users failed: ${res.status}`);
