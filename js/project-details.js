@@ -17,58 +17,69 @@ window.loadCurrentTeam = window.loadCurrentTeam || (async function loadCurrentTe
   return;
 });
 // ------------------------------------------
-// TEAM MODAL (placeholder so button works)
+// TEAM MODAL (Deployment Team)
 // ------------------------------------------
-// --- Team Modal: real open/close wiring (UI only) ---
 
+// Close modal
 window.closeTeamModal = function () {
   const overlay = document.getElementById('teamModalOverlay');
   if (overlay) overlay.style.display = 'none';
 };
 
-// Wire close buttons (safe optional chaining)
+// Wire close buttons + outside click (safe)
 document.getElementById('closeTeamModalBtn')?.addEventListener('click', window.closeTeamModal);
 document.getElementById('teamModalCancelBtn')?.addEventListener('click', window.closeTeamModal);
-
-// Optional: click outside modal closes it
 document.getElementById('teamModalOverlay')?.addEventListener('click', (e) => {
   if (e.target && e.target.id === 'teamModalOverlay') window.closeTeamModal();
 });
 
+// Open modal + load dropdown users
+window.openTeamModal = function () {
+  const overlay = document.getElementById('teamModalOverlay');
+  if (!overlay) {
+    console.warn('teamModalOverlay not found');
+    return;
+  }
+  overlay.style.display = 'flex';
+  loadUsersIntoTeamModal();
+};
+
+// Load users into dropdown
 async function loadUsersIntoTeamModal() {
-  const select = document.getElementById('teamMemberSelect'); // must exist in HTML
+  const select = document.getElementById('teamMemberSelect');
   if (!select) {
     console.warn('teamMemberSelect not found');
     return;
   }
 
-  // Show loading state
   select.innerHTML = `<option value="">Loading users...</option>`;
   select.disabled = true;
 
   try {
     const token = localStorage.getItem('token');
 
-const res = await fetch(`${window.API_BASE || ''}/api/users`, {
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  }
-});
-
+    const res = await fetch(`${window.API_BASE || ''}/api/users`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
 
     if (!res.ok) {
-      throw new Error(`GET /api/users failed: ${res.status}`);
+      const txt = await res.text().catch(() => '');
+      console.error('GET /api/users failed:', res.status, txt);
+      select.innerHTML = `<option value="">Failed to load users</option>`;
+      return;
     }
 
-const payload = await res.json();
-const users = Array.isArray(payload) ? payload : (payload.users || payload.data || []);
+    const payload = await res.json();
+    const users = Array.isArray(payload) ? payload : (payload.users || payload.data || []);
 
-    // Build options
     select.innerHTML = `<option value="">Select a team member...</option>`;
+
     users.forEach(u => {
       const label =
-        (u.fullName || u.name || '').trim() ||
+        (u.fullName || u.name || u.full_name || '').trim() ||
         (u.email || '').trim() ||
         `User ${u.id}`;
 
@@ -84,16 +95,8 @@ const users = Array.isArray(payload) ? payload : (payload.users || payload.data 
     select.innerHTML = `<option value="">Failed to load users</option>`;
   }
 }
-window.openTeamModal = function () {
-  const overlay = document.getElementById('teamModalOverlay');
-  if (!overlay) {
-    console.warn('teamModalOverlay not found');
-    return;
-  }
-  overlay.style.display = 'flex';
-  loadUsersIntoTeamModal(); // ← ADD THIS LINE
-};
 
+// Load / render team members list (with Remove)
 async function loadProjectTeamMembers(projectId) {
   const list = document.getElementById('currentTeamList');
   if (!list) {
@@ -105,6 +108,7 @@ async function loadProjectTeamMembers(projectId) {
 
   try {
     const token = localStorage.getItem('token');
+
     const res = await fetch(`${window.API_BASE || ''}/api/team/project/${projectId}/members`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -125,27 +129,64 @@ async function loadProjectTeamMembers(projectId) {
     }
 
     list.innerHTML = '';
+
     members.forEach(m => {
       const u = m.User || {};
-      const name = u.full_name || u.fullName || u.name || u.email || `User ${m.user_id}`;
+      const name =
+        u.full_name ||
+        u.fullName ||
+        u.name ||
+        u.email ||
+        `User ${m.user_id}`;
       const role = m.role || 'technician';
 
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;border:1px solid #e2e8f0;border-radius:10px;background:#fff;';
+      row.style.cssText =
+        'display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;border:1px solid #e2e8f0;border-radius:10px;background:#fff;';
+
       row.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:0.15rem;">
-          <div style="font-weight:700;color:#1e293b;">${name}</div>
-          <div style="font-size:0.85rem;color:#64748b;">${role}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+          <div style="display:flex;flex-direction:column;gap:0.15rem;">
+            <div style="font-weight:700;color:#1e293b;">${name}</div>
+            <div style="font-size:0.85rem;color:#64748b;">${role}</div>
+          </div>
+          <button
+            data-user-id="${m.user_id}"
+            style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:0.4rem 0.6rem;cursor:pointer;">
+            Remove
+          </button>
         </div>
       `;
+
       list.appendChild(row);
+
+      row.querySelector('button')?.addEventListener('click', async () => {
+        if (!confirm('Remove this team member from the project?')) return;
+
+        const token = localStorage.getItem('token');
+        const delRes = await fetch(
+          `${window.API_BASE || ''}/api/team/project/${projectId}/members/${m.user_id}`,
+          {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          }
+        );
+
+        if (!delRes.ok) {
+          const txt = await delRes.text().catch(() => '');
+          console.error('Remove failed:', delRes.status, txt);
+          alert(`Remove failed: ${delRes.status}`);
+          return;
+        }
+
+        loadProjectTeamMembers(projectId); // refresh list
+      });
     });
   } catch (err) {
     console.error(err);
     list.innerHTML = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team</p>`;
   }
 }
-
 
 // ==========================================
 // INIT
