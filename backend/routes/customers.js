@@ -103,35 +103,51 @@ router.get('/:id/contacts', protect, async (req, res) => {
 });
 
 /*
+/*
 |--------------------------------------------------------------------------
-| GET CUSTOMER POCs (ALIAS) /api/customers/:id/pocs
+| GET CUSTOMER POCs (PRIMARY + BACKWARDS-COMPAT ALIAS)
 |--------------------------------------------------------------------------
-// Get customer POCs (primary route)
+| /api/customers/:id/pocs
+| /api/customers/:id/contacts  (legacy frontend support)
+|--------------------------------------------------------------------------
+*/
+
+// PRIMARY: preferred route
 router.get('/:id/pocs', protect, async (req, res) => {
   try {
-    const customer = await Customer.findByPk(req.params.id);
+    const customerId = Number(req.params.id);
+    if (!customerId) {
+      return res.status(400).json({ success: false, message: 'Invalid customer id' });
+    }
+
+    const customer = await Customer.findByPk(customerId);
     if (!customer) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
     const data = buildPocsFromCustomer(customer);
-    return res.json({ success: true, count: data.length, data });
+    res.json({ success: true, count: data.length, data });
   } catch (error) {
     console.error('Get customer POCs error:', error);
     res.status(500).json({ success: false, message: 'Error fetching POCs' });
   }
 });
 
-// BACKWARDS-COMPAT ALIAS — frontend calls /contacts
+// ALIAS: legacy frontend route
 router.get('/:id/contacts', protect, async (req, res) => {
   try {
-    const customer = await Customer.findByPk(req.params.id);
+    const customerId = Number(req.params.id);
+    if (!customerId) {
+      return res.status(400).json({ success: false, message: 'Invalid customer id' });
+    }
+
+    const customer = await Customer.findByPk(customerId);
     if (!customer) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
 
     const data = buildPocsFromCustomer(customer);
-    return res.json({ success: true, count: data.length, data });
+    res.json({ success: true, count: data.length, data });
   } catch (error) {
     console.error('Get customer contacts error:', error);
     res.status(500).json({ success: false, message: 'Error fetching contacts' });
@@ -143,6 +159,7 @@ router.get('/:id/contacts', protect, async (req, res) => {
 | CREATE CUSTOMER / CONTACT
 |--------------------------------------------------------------------------
 */
+
 router.post('/', protect, async (req, res) => {
   try {
     if (!['admin', 'pm'].includes(req.user.role)) {
