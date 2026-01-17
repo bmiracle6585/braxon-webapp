@@ -96,15 +96,24 @@ async function loadUsersIntoTeamModal() {
   }
 }
 
-// Load / render team members list (with Remove)
+// Load / render team members list (Modal + Main Widget) + Remove
 async function loadProjectTeamMembers(projectId) {
-  const list = document.getElementById('currentTeamList');
-  if (!list) {
-    console.warn('currentTeamList not found');
-    return;
-  }
+  const modalList = document.getElementById('currentTeamList');
+  const widgetList = document.getElementById('teamMembersList');
 
-  list.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:1rem;">Loading team...</p>`;
+  if (!modalList) console.warn('currentTeamList not found');
+  if (!widgetList) console.warn('teamMembersList not found');
+
+  if (modalList) {
+    modalList.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:1rem;">Loading team...</p>`;
+  }
+  if (widgetList) {
+    widgetList.innerHTML = `
+      <div style="text-align:center; padding: 2rem; color: #64748b;">
+        <p style="margin:0;">Loading team...</p>
+      </div>
+    `;
+  }
 
   try {
     const token = localStorage.getItem('token');
@@ -116,7 +125,10 @@ async function loadProjectTeamMembers(projectId) {
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
       console.error('Load team failed:', res.status, txt);
-      list.innerHTML = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team (${res.status})</p>`;
+
+      const errHtml = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team (${res.status})</p>`;
+      if (modalList) modalList.innerHTML = errHtml;
+      if (widgetList) widgetList.innerHTML = errHtml;
       return;
     }
 
@@ -124,69 +136,143 @@ async function loadProjectTeamMembers(projectId) {
     const members = payload.data || [];
 
     if (!members.length) {
-      list.innerHTML = `<p style="text-align:center;color:#94a3b8;padding:1rem;">No team members yet</p>`;
+      const emptyHtml = `<p style="text-align:center;color:#94a3b8;padding:1rem;">No team members yet</p>`;
+      if (modalList) modalList.innerHTML = emptyHtml;
+
+      if (widgetList) {
+        widgetList.innerHTML = `
+          <div style="text-align: center; padding: 3rem; color: #64748b;">
+            <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin: 0 auto 1rem; opacity: 0.3;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <p style="font-size: 1rem; margin-bottom: 0.5rem; font-weight: 600;">No team members assigned yet</p>
+            <p style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0;">
+              Team members will have mobile access to this project
+            </p>
+          </div>
+        `;
+      }
       return;
     }
 
-    list.innerHTML = '';
+    // Clear + render both lists
+    if (modalList) modalList.innerHTML = '';
+    if (widgetList) widgetList.innerHTML = '';
 
     members.forEach(m => {
       const u = m.User || {};
+
+      // ✅ Normalize member user id across old/new records
+      const memberUserId = m.user_id || m.userId || u.id;
+
       const name =
         u.full_name ||
         u.fullName ||
         u.name ||
         u.email ||
-        `User ${m.user_id}`;
+        `User ${memberUserId || ''}`.trim();
+
       const role = m.role || 'technician';
 
-      const row = document.createElement('div');
-      row.style.cssText =
-        'display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;border:1px solid #e2e8f0;border-radius:10px;background:#fff;';
+      // -------------------------
+      // MODAL ROW
+      // -------------------------
+      if (modalList) {
+        const row = document.createElement('div');
+        row.style.cssText =
+          'display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;border:1px solid #e2e8f0;border-radius:10px;background:#fff;';
 
-      row.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-          <div style="display:flex;flex-direction:column;gap:0.15rem;">
+        row.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+            <div style="display:flex;flex-direction:column;gap:0.15rem;">
+              <div style="font-weight:700;color:#1e293b;">${name}</div>
+              <div style="font-size:0.85rem;color:#64748b;">${role}</div>
+            </div>
+            <button
+              data-user-id="${memberUserId || ''}"
+              style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:0.4rem 0.6rem;cursor:pointer;">
+              Remove
+            </button>
+          </div>
+        `;
+
+        modalList.appendChild(row);
+
+        row.querySelector('button')?.addEventListener('click', async () => {
+          if (!memberUserId) return alert('Missing user id on this row');
+          if (!confirm('Remove this team member from the project?')) return;
+
+          const delRes = await fetch(
+            `${window.API_BASE || ''}/api/team/project/${projectId}/members/${memberUserId}`,
+            {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+
+          if (!delRes.ok) {
+            const txt = await delRes.text().catch(() => '');
+            console.error('Remove failed:', delRes.status, txt);
+            return alert(`Remove failed: ${delRes.status}`);
+          }
+
+          loadProjectTeamMembers(projectId);
+        });
+      }
+
+      // -------------------------
+      // MAIN WIDGET CARD
+      // -------------------------
+      if (widgetList) {
+        const card = document.createElement('div');
+        card.style.cssText =
+          'display:flex;justify-content:space-between;align-items:center;padding:1rem;border:1px solid #e2e8f0;border-radius:12px;background:#fff;margin-bottom:0.75rem;';
+
+        card.innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:0.2rem;">
             <div style="font-weight:700;color:#1e293b;">${name}</div>
             <div style="font-size:0.85rem;color:#64748b;">${role}</div>
           </div>
           <button
-            data-user-id="${m.user_id}"
-            style="background:#dc2626;color:#fff;border:none;border-radius:6px;padding:0.4rem 0.6rem;cursor:pointer;">
+            data-user-id="${memberUserId || ''}"
+            style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:0.5rem 0.75rem;cursor:pointer;font-weight:600;">
             Remove
           </button>
-        </div>
-      `;
+        `;
 
-      list.appendChild(row);
+        widgetList.appendChild(card);
 
-      row.querySelector('button')?.addEventListener('click', async () => {
-        if (!confirm('Remove this team member from the project?')) return;
+        card.querySelector('button')?.addEventListener('click', async () => {
+          if (!memberUserId) return alert('Missing user id on this row');
+          if (!confirm('Remove this team member from the project?')) return;
 
-        const token = localStorage.getItem('token');
-        const delRes = await fetch(
-          `${window.API_BASE || ''}/api/team/project/${projectId}/members/${m.user_id}`,
-          {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+          const delRes = await fetch(
+            `${window.API_BASE || ''}/api/team/project/${projectId}/members/${memberUserId}`,
+            {
+              method: 'DELETE',
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+
+          if (!delRes.ok) {
+            const txt = await delRes.text().catch(() => '');
+            console.error('Remove failed:', delRes.status, txt);
+            return alert(`Remove failed: ${delRes.status}`);
           }
-        );
 
-        if (!delRes.ok) {
-          const txt = await delRes.text().catch(() => '');
-          console.error('Remove failed:', delRes.status, txt);
-          alert(`Remove failed: ${delRes.status}`);
-          return;
-        }
-
-        loadProjectTeamMembers(projectId); // refresh list
-      });
+          loadProjectTeamMembers(projectId);
+        });
+      }
     });
   } catch (err) {
     console.error(err);
-    list.innerHTML = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team</p>`;
+    const errHtml = `<p style="text-align:center;color:#dc2626;padding:1rem;">Failed to load team</p>`;
+    if (modalList) modalList.innerHTML = errHtml;
+    if (widgetList) widgetList.innerHTML = errHtml;
   }
 }
+
 
 // ==========================================
 // INIT
