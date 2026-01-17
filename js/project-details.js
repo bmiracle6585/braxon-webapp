@@ -334,6 +334,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const token = localStorage.getItem('token');
 
+    console.log('ADD TEAM POST payload (about to send):', {
+  projectId,
+  user_id,
+  role,
+  roleSelectValue: teamRoleSelect?.value,
+});
+
+
     const res = await fetch(`${window.API_BASE || ''}/api/team/project/${pid}/members`, {
       method: 'POST',
       headers: {
@@ -342,6 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       body: JSON.stringify({ user_id, role, notes })
     });
+
 
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
