@@ -134,6 +134,38 @@ function initTeamButtons() {
     });
   }
 }  
+  document.getElementById('addTeamMemberForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const pid = new URLSearchParams(window.location.search).get('id');
+  if (!pid) return alert('Project ID not found');
+
+  const user_id = document.getElementById('teamMemberSelect')?.value;
+  const role = document.getElementById('teamRoleSelect')?.value;
+  const notes = document.getElementById('teamNotes')?.value || '';
+
+  if (!user_id) return alert('Select a team member');
+
+  const token = localStorage.getItem('token');
+
+  const res = await fetch(`${window.API_BASE || ''}/api/team/project/${pid}/members`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ user_id, role, notes })
+  });
+
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    console.error('Add team member failed:', res.status, txt);
+    return alert(`Add failed: ${res.status}`);
+  }
+
+  alert('Added to team');
+});
+
 
    // 🔑 MUST COME FIRST
   initTeamButtons();
