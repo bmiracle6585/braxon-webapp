@@ -708,7 +708,6 @@ async function loadCustomersForEdit(selectedCustomerId) {
 
 if (selectedCustomerId) {
   loadPocsForEdit(selectedCustomerId);
-  select.dispatchEvent(new Event('change'));
 }
   } catch (err) {
     console.error('Load customers error:', err);
