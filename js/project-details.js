@@ -431,10 +431,10 @@ function displayProjectData(project) {
 
   // Site names
   const siteANameElement = document.querySelector('.site-info-grid .site-column:nth-child(1) .site-value');
-  if (siteANameElement) siteANameElement.textContent = project.site_a_name || '';
+if (siteANameElement) siteANameElement.textContent = project.site_a_name || '-';
 
   const siteBNameElement = document.querySelector('.site-info-grid .site-column:nth-child(2) .site-value');
-  if (siteBNameElement) siteBNameElement.textContent = project.site_b_name || '';
+  if (siteBNameElement) siteBNameElement.textContent = project.site_b_name || '-';
 
   // Locations (site-info-grid values-with-icon)
   const siteALocationDivs = document.querySelectorAll('.site-info-grid .site-column:nth-child(1) .site-value-with-icon');
