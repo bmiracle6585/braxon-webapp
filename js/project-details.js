@@ -644,7 +644,8 @@ function closeEditModal() {
 
   document.body.style.overflow = '';
   // IMPORTANT: don't reset on cancel/close (prevents clearing values)
-  // document.getElementById('editProjectForm')?.reset();}
+// document.getElementById('editProjectForm')?.reset();
+}
 
 function populateEditModal() {
   const p = window.currentProject;
