@@ -318,13 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------
   // Add Team Member Form Submit
   // ------------------------------------------
- (function wireAddTeamMemberFormOnce() {
+ function wireAddTeamMemberFormOnce() {
   const form = document.getElementById('addTeamMemberForm');
   if (!form) return;
 
-  // Prevent double-binding across multiple init paths
-  if (form.dataset.bound === 'true') return;
-  form.dataset.bound = 'true';
+  // Prevent double-binding
+  if (form.dataset.submitWired === 'true') return;
+  form.dataset.submitWired = 'true';
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -340,15 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const token = localStorage.getItem('token');
 
-  console.log('ADD TEAM POST payload (about to send):', {
-  pid,
-  user_id,
-  role,
-roleSelectValue: document.getElementById('teamRoleSelect')?.value,
-});
-
-
-
     const res = await fetch(`${window.API_BASE || ''}/api/team/project/${pid}/members`, {
       method: 'POST',
       headers: {
@@ -358,17 +349,15 @@ roleSelectValue: document.getElementById('teamRoleSelect')?.value,
       body: JSON.stringify({ user_id, role, notes })
     });
 
-
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
       console.error('Add team member failed:', res.status, txt);
       return alert(`Add failed: ${res.status}`);
     }
 
-    alert('Added to team');
-    loadProjectTeamMembers(pid); // refresh both modal + widget
+    loadProjectTeamMembers(pid);
   });
-})();
+}
 
   // ------------------------------------------
   // Page Initialization Order
@@ -382,7 +371,9 @@ roleSelectValue: document.getElementById('teamRoleSelect')?.value,
   initProjectDetailsPage();
   initStatusChange();
   showDeleteButtonIfAdmin();
-  wireEditFormSubmitOnce();
+  wireAddTeamMemberFormOnce();
+
+    // wireEditFormSubmitOnce(); // removed (handled by handleEditSubmit binding below)
 
   if (pid) loadProjectTeamMembers(pid);
 });
@@ -653,8 +644,8 @@ function closeEditModal() {
   if (modal) modal.style.display = 'none';
 
   document.body.style.overflow = '';
-  document.getElementById('editProjectForm')?.reset();
-}
+  // IMPORTANT: don't reset on cancel/close (prevents clearing values)
+  // document.getElementById('editProjectForm')?.reset();}
 
 function populateEditModal() {
   const p = window.currentProject;
