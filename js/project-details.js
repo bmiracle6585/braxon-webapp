@@ -410,6 +410,40 @@ async function loadProjectData() {
   }
 }
 
+function displayPerDiemInfo(project) {
+  const total = parseInt(project.per_diem_total || 0, 10);
+  const used = parseInt(project.per_diem_used || 0, 10);
+  const remaining = Math.max(total - used, 0);
+  const pct = total > 0 ? Math.round((used / total) * 100) : 0;
+
+  const totalEl = document.getElementById('totalPerDiemNights');
+  const usedEl = document.getElementById('usedPerDiemNights');
+  const remEl = document.getElementById('remainingPerDiemNights');
+  const pctEl = document.getElementById('perDiemPercentage');
+  const barEl = document.getElementById('perDiemProgressBar');
+
+  if (totalEl) totalEl.textContent = total;
+  if (usedEl) usedEl.textContent = used;
+  if (remEl) remEl.textContent = remaining;
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  if (barEl) barEl.style.width = `${pct}%`;
+
+  const isAdmin = localStorage.getItem('userRole') === 'admin';
+
+  const editTotal = document.getElementById('editPerDiemTotal');
+  const editUsed = document.getElementById('editPerDiemUsed');
+
+  if (editTotal) {
+    editTotal.value = total;
+    editTotal.disabled = !isAdmin;
+  }
+
+  if (editUsed) {
+    editUsed.value = used;
+    editUsed.disabled = !isAdmin;
+  }
+}
+
 function displayProjectData(project) {
   console.log('🎯 displayProjectData CALLED with:', project);
   window.currentProject = project;
