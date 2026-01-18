@@ -963,4 +963,3 @@ function setDynamicLinks() {
     closeoutLink.href = `closeout-package.html?projectId=${projectId}`;
   }
 }
-});
