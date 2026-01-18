@@ -367,29 +367,34 @@ router.post('/', protect, async (req, res) => {
     console.log('📥 RECEIVED PROJECT DATA:', req.body);
 
     const {
-      project_code,
-      project_name,
-      customer_id,
-      customer_poc,
-      project_manager_id,
-      qa_user_id,
-      status,
-      start_date,
-      end_date,
-      hours_estimate,
-      site_a_name,
-      site_a_address,
-      site_a_location,
-      site_a_latitude,
-      site_a_longitude,
-      site_b_name,
-      site_b_address,
-      site_b_location,
-      site_b_latitude,
-      site_b_longitude,
-      scope_of_work,
-      description
-    } = req.body;
+  project_code,
+  project_name,
+  customer_id,
+  customer_poc,
+  project_manager_id,
+  qa_user_id,
+  status,
+  start_date,
+  end_date,
+  hours_estimate,
+
+  hours_budget_total,
+  hours_budget_used,
+  per_diem_total,
+  per_diem_used,
+
+  site_a_name,
+  site_a_location,
+  site_a_latitude,
+  site_a_longitude,
+  site_b_name,
+  site_b_location,
+  site_b_latitude,
+  site_b_longitude,
+  scope_of_work,
+  description
+} = req.body;
+
 
     // Validate required fields
     if (!project_code || !project_name) {
@@ -587,6 +592,10 @@ router.put('/:id', protect, async (req, res) => {
       start_date: start_date !== undefined ? start_date : project.start_date,
       end_date: end_date !== undefined ? end_date : project.end_date,
       hours_estimate: hours_estimate !== undefined ? hours_estimate : project.hours_estimate,
+      hours_budget_total: hours_budget_total !== undefined ? hours_budget_total : project.hours_budget_total,
+hours_budget_used: hours_budget_used !== undefined ? hours_budget_used : project.hours_budget_used,
+per_diem_total: per_diem_total !== undefined ? per_diem_total : project.per_diem_total,
+per_diem_used: per_diem_used !== undefined ? per_diem_used : project.per_diem_used,
       site_a_name: site_a_name !== undefined ? site_a_name : project.site_a_name,
       site_a_location: site_a_location !== undefined ? site_a_location : project.site_a_location,
       site_a_latitude:
