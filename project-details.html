@@ -681,11 +681,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="editProjectName">Project Name *</label>
-                        <input type="text" id="editProjectName" placeholder="Enter project name" required>
+                        <input type="text" id="editProjectName" name="project_name" placeholder="Enter project name" required>
                     </div>
                     <div class="form-group">
                         <label for="editScopeOfWork">Scope of Work</label>
-                        <select id="editScopeOfWork">
+                        <select id="editScopeOfWork" name="scope_of_work">
                             <option value="">Select scope...</option>
                             <option value="New Installation">New Installation</option>
                             <option value="Upgrade">Upgrade</option>
@@ -700,7 +700,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="editProjectStatus">Status</label>
-                        <select id="editProjectStatus">
+                        <select id="editProjectStatus" name="status">
                             <option value="pending">Pending</option>
                             <option value="in_progress">In Progress</option>
                             <option value="completed">Completed</option>
@@ -709,7 +709,7 @@
                     </div>
                     <div class="form-group">
                         <label for="editHoursBudget">Hours Budget</label>
-                        <input type="number" id="editHoursBudget" placeholder="Estimated hours" step="0.5">
+                        <input type="number" id="editHoursBudget" placeholder="Esti<input type="number" id="editHoursBudget" name="hours_estimate" placeholder="Estimated hours" step="0.5">
                     </div>
                 </div>
 
@@ -717,11 +717,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="editSiteAName">Site A Name *</label>
-                        <input type="text" id="editSiteAName" placeholder="Site A name" required>
+                        <input type="text" id="editSiteAName" name="site_a_name" placeholder="Site A name" required>
                     </div>
                     <div class="form-group">
                         <label for="editSiteBName">Site B Name</label>
-                        <input type="text" id="editSiteBName" placeholder="Site B name (optional)">
+                        <input type="text" id="editSiteBName" name="site_b_name" placeholder="Site B name (optional)">
                     </div>
                 </div>
 
@@ -729,12 +729,12 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="editSiteALocation">Site A Location (DMS) *</label>
-                        <input type="text" id="editSiteALocation" placeholder="34 27 54.93, -109 37 41.59" required>
+                        <input type="text" id="editSiteALocation" name="site_a_location" placeholder="34 27 54.93, -109 37 41.59" required>
                         <small class="form-hint">Format: DD MM SS.SS, -DDD MM SS.SS</small>
                     </div>
                     <div class="form-group">
                         <label for="editSiteBLocation">Site B Location (DMS)</label>
-                        <input type="text" id="editSiteBLocation" placeholder="34 36 6.11, -109 37 44.73">
+                        <input type="text" id="editSiteBLocation" name="site_b_location" placeholder="34 36 6.11, -109 37 44.73">
                         <small class="form-hint">Optional second site</small>
                     </div>
                 </div>
@@ -743,18 +743,18 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="editStartDate">Start Date *</label>
-                        <input type="date" id="editStartDate" required>
+                        <input type="date" id="editStartDate" name="start_date" required>
                     </div>
                     <div class="form-group">
                         <label for="editEndDate">Expected Completion Date</label>
-                        <input type="date" id="editEndDate">
+                        <input type="date" id="editEndDate" name="end_date">
                     </div>
                 </div>
 
                 <!-- Row 7: Description -->
                 <div class="form-group">
                     <label for="editProjectDescription">Project Description</label>
-                    <textarea id="editProjectDescription" placeholder="Project description and notes" rows="3"></textarea>
+                    <textarea id="editProjectDescription" name="description" placeholder="Project description and notes" rows="3"></textarea>
                 </div>
 
                 <!-- Form Actions -->
