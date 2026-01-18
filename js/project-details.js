@@ -314,7 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
-
   // ------------------------------------------
   // Add Team Member Form Submit
   // ------------------------------------------
@@ -964,3 +963,4 @@ function setDynamicLinks() {
     closeoutLink.href = `closeout-package.html?projectId=${projectId}`;
   }
 }
+});
