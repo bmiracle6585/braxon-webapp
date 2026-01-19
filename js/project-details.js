@@ -698,6 +698,58 @@ function populateEditModal() {
 
   loadCustomersForEdit(p.customer_id);
 }
+// ------------------------------------------
+// Save Project Changes (Edit Modal)
+// ------------------------------------------
+window.saveProjectChanges = async function (e) {
+  e.preventDefault();
+
+  const token = localStorage.getItem('token');
+  const projectId = document.getElementById('editProjectId')?.value;
+  if (!projectId) return alert('Project ID missing');
+
+  const payload = {
+    project_name: document.getElementById('editProjectName')?.value ?? null,
+    scope_of_work: document.getElementById('editScopeOfWork')?.value ?? null,
+    status: document.getElementById('editProjectStatus')?.value ?? null,
+    site_a_name: document.getElementById('editSiteAName')?.value ?? null,
+    site_b_name: document.getElementById('editSiteBName')?.value ?? null,
+    site_a_location: document.getElementById('editSiteALocation')?.value ?? null,
+    site_b_location: document.getElementById('editSiteBLocation')?.value ?? null,
+    start_date: document.getElementById('editStartDate')?.value ?? null,
+    end_date: document.getElementById('editEndDate')?.value ?? null,
+    description: document.getElementById('editProjectDescription')?.value ?? null
+  };
+
+  // Admin-only budgets (include only if inputs exist)
+  const hbt = document.getElementById('editHoursBudgetTotal');
+  const hbu = document.getElementById('editHoursBudgetUsed');
+  const pdt = document.getElementById('editPerDiemTotal');
+  const pdu = document.getElementById('editPerDiemUsed');
+
+  if (hbt && hbt.value !== '') payload.hours_budget_total = Number(hbt.value);
+  if (hbu && hbu.value !== '') payload.hours_budget_used  = Number(hbu.value);
+  if (pdt && pdt.value !== '') payload.per_diem_total     = Number(pdt.value);
+  if (pdu && pdu.value !== '') payload.per_diem_used      = Number(pdu.value);
+
+  const res = await fetch(`/api/projects/${projectId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const result = await res.json();
+  if (!result?.success) return alert(result?.message || 'Update failed');
+
+  window.currentProject = result.project;
+  displayProjectData(result.project);
+  displayPerDiemInfo(result.project);
+  closeEditModal();
+};
+
 
 function setVal(id, val) {
   const el = document.getElementById(id);
